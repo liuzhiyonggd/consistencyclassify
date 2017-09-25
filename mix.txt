@@ -1,0 +1,6 @@
+@attribute 'codeSimilarity' numeric
+@attribute 'oldCodeOldCommentSimilarity' numeric
+@attribute 'newCodeOldCommentSimilarity' numeric
+@attribute 'subSimilarity' numeric
+@attribute 'codeAddWords' numeric
+@attribute 'codeDeleteWords' numeric
