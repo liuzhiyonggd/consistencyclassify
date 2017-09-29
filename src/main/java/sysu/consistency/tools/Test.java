@@ -9,6 +9,8 @@ import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 
+import sysu.consistency.db.mongo.RepositoryFactory;
+
 public class Test {
 	
 //	public static void main(String[] args) throws IOException{
@@ -44,6 +46,10 @@ public class Test {
 	
 	public void test(){
 		System.out.println("test method invoke.");
+	}
+	
+	public static void main(String[] args) {
+		RepositoryFactory.getClassRepository().findASingleByClassID(183);
 	}
 
 }

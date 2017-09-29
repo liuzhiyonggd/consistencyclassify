@@ -4,10 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 
@@ -44,11 +42,13 @@ public class DataSet {
 				System.out.println(i +" is null.");
 				continue;
 			}
+			System.out.println("commit_id:"+comment.getCommitID());
 			List<Integer> vector = extractLineVector(comment);
+			
 			data.add(vector);
 		}
 		
-		writeFile(data, savePath+"/data"+".txt");
+		writeFile(data, savePath+"/common_data"+".txt");
 		System.out.println("write data file is done.");
 		}
 		
@@ -393,14 +393,14 @@ public class DataSet {
 //				vector.add(0);
 //			}
 			
-			// ��ͬ�����������
+			// 锟斤拷同锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟�
 //			vector.addAll(keywordMap.get(comment.getCommentID()));
 
 
 			CommentWord commentWord = wordRepository.findASingleByCommentIDAndType(comment.getCommentID(), comment.getType());
 			
 			/**
-			 * ��ע������
+			 * 锟斤拷注锟斤拷锟斤拷锟斤拷
 			 */
 			
 			List<String> oldCommentWordList = commentWord.getOldCommentWords();
@@ -409,7 +409,7 @@ public class DataSet {
 			vector.add(discridizeNum(oldCommentWordList.size()));
 			headerList.add("@attribute 'wordSize' numeric");
 			
-			//30. �Ƿ����Todos�ؼ���
+			//30. 锟角凤拷锟斤拷锟絋odos锟截硷拷锟斤拷
 			StringBuilder sb = new StringBuilder();
 			for(String str:comment.getOldComment()){
 				sb.append(str+" ");
@@ -423,7 +423,7 @@ public class DataSet {
 			headerList.add("@attribute 'todos' numeric");
 			
 			/**
-			 * ��������
+			 * 锟斤拷锟斤拷锟斤拷锟斤拷
 			 */
 			int codeSimilarity = (int)(commentWord.getCodeSimilarity()*100);
 			int oldCodeOldCommentSimilarity = (int)(commentWord.getOldCodeOldCommentSimilarity()*100);
@@ -431,28 +431,28 @@ public class DataSet {
 			int addWordNumber = commentWord.getAddWords().size();
 			int deleteWordNumber = commentWord.getDeleteWords().size();
 			
-			//31. �¾ɴ������ƶ�
+			//31. 锟铰旧达拷锟斤拷锟斤拷锟狡讹拷
 			vector.add(discridizeWeight(codeSimilarity));
 			headerList.add("@attribute 'codeSimilarity' numeric");
 			
-			//32. �ɴ���;�ע�����ƶ�
+			//32. 锟缴达拷锟斤拷途锟阶拷锟斤拷锟斤拷贫锟�
 			vector.add(discridizeWeight(oldCodeOldCommentSimilarity));
 			headerList.add("@attribute 'oldCodeOldCommentSimilarity' numeric");
 			
-			//33. �´���;�ע�����ƶ�
+			//33. 锟铰达拷锟斤拷途锟阶拷锟斤拷锟斤拷贫锟�
 			vector.add(discridizeWeight(newCodeOldCommentSimilarity));
 			headerList.add("@attribute 'newCodeOldCommentSimilarity' numeric");
 
 			
-			//34. �¾ɴ�����ע�����ƶ�֮��
+			//34. 锟铰旧达拷锟斤拷锟斤拷注锟斤拷锟斤拷锟狡讹拷之锟斤拷
 			vector.add(Math.abs(oldCodeOldCommentSimilarity-newCodeOldCommentSimilarity));
 			headerList.add("@attribute 'subSimilarity' numeric");
 			
-			//35. �´��������ӵ��ʸ���
+			//35. 锟铰达拷锟斤拷锟斤拷锟斤拷锟接碉拷锟绞革拷锟斤拷
 			vector.add(discridizeNum(addWordNumber));
 			headerList.add("@attribute 'addWordNumber' numeric");
 			
-			//36. �´�����ɾ�����ʸ���
+			//36. 锟铰达拷锟斤拷锟斤拷删锟斤拷锟斤拷锟绞革拷锟斤拷
 			vector.add(discridizeNum(deleteWordNumber));			
 			headerList.add("@attribute 'deleteWordNumber' numeric");
 
@@ -467,12 +467,16 @@ public class DataSet {
 	public static List<List<Integer>> combineVectors(List<List<Integer>> vectorList1,List<List<Integer>> vectorList2){
 		List<List<Integer>> resultVectors = new ArrayList<List<Integer>>();
 		if(vectorList1.size()!=vectorList2.size()) {
+			System.out.println("size not equal.");
 			return new ArrayList<List<Integer>>();
+			
 		}
 		for(int i=0,n=vectorList1.size();i<n;i++) {
 			List<Integer> vector1 = vectorList1.get(i);
 			List<Integer> vector2 = vectorList2.get(i);
-			if(vector1.get(0)!=vector2.get(0)) {
+			if(!vector1.get(0).equals(vector2.get(0))) {
+				System.out.println("id is not equal.");
+				System.out.println("vector1:"+vector1.get(0)+" vector2:"+vector2.get(0));
 				return new ArrayList<List<Integer>>();
 			}
 			
@@ -498,14 +502,11 @@ public class DataSet {
 		heads1 = FileUtils.readLines(new File("file/commonhead.txt"),"UTF-8");
 		
 		List<String> heads2 = new ArrayList<String>();
-		heads2 =FileUtils.readLines(new File("linecomment.txt"),"UTF-8");
+		heads2 =FileUtils.readLines(new File("file/refactorhead.txt"),"UTF-8");
 		
-		List<String> heads3 = new ArrayList<String>();
-		heads3 = FileUtils.readLines(new File("mix.txt"),"UTF-8");
 
 		fileLines.addAll(heads1);
-		fileLines.addAll(heads2);
-		fileLines.addAll(heads3);
+//		fileLines.addAll(heads2);
 		
 		fileLines.add("@attribute 'class' {0,1}");
 		fileLines.add("@data");
@@ -597,8 +598,29 @@ public class DataSet {
 		return 0;
 	}
 	
+	public static List<List<Integer>> getVectorList4File(String path) throws IOException{
+		List<List<Integer>> vectorList = new ArrayList<List<Integer>>();
+		List<String> lines = FileUtils.readLines(new File(path),"UTF-8");
+		for(String line:lines) {
+			List<Integer> vector = new ArrayList<Integer>();
+			String[] temps = line.split(" ");
+			for(int i=0;i<temps.length;i++) {
+				vector.add(Integer.parseInt(temps[i]));
+			}
+			vectorList.add(vector);
+		}
+		return vectorList;
+	}
+	
 	public static void main(String[] args) throws IOException{
-		DataSet.generateDataSet("file/id2.txt","dataset");
+//		DataSet.generateDataSet("file/idList.txt","dataset");
+		List<List<Integer>> vectorList1 = getVectorList4File("dataset/common_data.txt");
+		List<List<Integer>> vectorList2 = getVectorList4File("dataset/refactor_data.txt");
+		List<List<Integer>> vectorList = combineVectors(vectorList1, vectorList2);
+		writeFile(vectorList, "file/data.arff");
+		writeFile(vectorList1,"file/data2.arff");
+		
+		
 	}
 
 }

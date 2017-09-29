@@ -1,7 +1,6 @@
 package sysu.consistency.db.config;
 
 
-import java.util.Arrays;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -12,15 +11,13 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 
 import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
-import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
 
-import sysu.consistency.aop.Log;
 import sysu.consistency.tools.Test;
 
 @Configuration
 @ComponentScan
-@EnableMongoRepositories(basePackages="db.repository")
+@EnableMongoRepositories(basePackages="sysu.consistency.db.repository")
 @EnableAspectJAutoProxy
 public class MongoConfig extends AbstractMongoConfiguration{
 
@@ -31,8 +28,8 @@ public class MongoConfig extends AbstractMongoConfiguration{
 
 	@Override
 	public Mongo mongo() throws Exception {
-		MongoCredential credential = MongoCredential.createMongoCRCredential("zhiyong", "sourcebase", "liu888888".toCharArray());
-		return new MongoClient(new ServerAddress("172.18.217.106",27017),Arrays.asList(credential));
+//		MongoCredential credential = MongoCredential.createMongoCRCredential("zhiyong", "sourcebase", "liu888888".toCharArray());
+		return new MongoClient(new ServerAddress("192.168.2.168",27017));
 //		return new MongoClient("localhost");
 	}
 	

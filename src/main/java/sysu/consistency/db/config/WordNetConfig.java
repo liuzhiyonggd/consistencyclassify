@@ -19,7 +19,7 @@ public class WordNetConfig {
 	@Bean(name="dictionary")
 	public IRAMDictionary getDictionary(){
 		//�����ʵ�
-		String path = "C:/program files (x86)/WordNet/2.1/dict";
+		String path = "C:\\Program Files (x86)\\WordNet\\2.1\\dict";
 	    URL url = null;
 		try {
 			url = new URL("file", null, path);

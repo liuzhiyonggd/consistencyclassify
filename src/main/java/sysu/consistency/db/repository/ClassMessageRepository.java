@@ -9,7 +9,7 @@ import sysu.consistency.db.bean.ClassMessage;
 
 public interface ClassMessageRepository extends MongoRepository<ClassMessage,ObjectId>{
 	
-	List<ClassMessage> findByProjectAndCommitID(String project,int commitID);
+	List<ClassMessage> findByProjectAndCommitID(String project,String commitID);
 	List<ClassMessage> findByProjectAndType(String project,String type);
 	List<ClassMessage> findByType(String type);
 	List<ClassMessage> findByProject(String project);

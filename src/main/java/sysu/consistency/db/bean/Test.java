@@ -14,7 +14,7 @@ public class Test {
 	public static void testClassTable(){
 		ClassMessageRepository classRepo = RepositoryFactory.getClassRepository();
 		
-		List<ClassMessage> classList = classRepo.findByProjectAndCommitID("jhotdraw", 100);
+		List<ClassMessage> classList = classRepo.findByProjectAndCommitID("jhotdraw", "100");
 		
 		ClassMessage clazz = classList.get(0);
 		
@@ -29,7 +29,7 @@ public class Test {
 		System.out.println("new token:"+clazz.getNewTokenList().size());
 		System.out.println("old token:"+clazz.getOldTokenList().size());
 		System.out.println("diff:"+clazz.getDiffList().size());
-		System.out.println(clazz.getIsCoreProbability());
+//		System.out.println(clazz.getIsCoreProbability());
 	}
 
 }

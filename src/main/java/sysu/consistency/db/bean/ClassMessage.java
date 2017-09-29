@@ -41,8 +41,8 @@ public class ClassMessage {
 	@Field("old_comments")
 	private List<CodeComment> oldComment;
 	
-	@Field("iscore_probability")
-	private double isCoreProbability;
+//	@Field("iscore_probability")
+//	private double isCoreProbability;
 	
 	
 	
@@ -119,11 +119,11 @@ public class ClassMessage {
 	public void setOldCode(List<Line> oldCode) {
 		this.oldCode = oldCode;
 	}
-	public double getIsCoreProbability() {
-		return isCoreProbability;
-	}
-	public void setIsCoreProbability(double isCoreProbability) {
-		this.isCoreProbability = isCoreProbability;
-	}
+//	public double getIsCoreProbability() {
+//		return isCoreProbability;
+//	}
+//	public void setIsCoreProbability(double isCoreProbability) {
+//		this.isCoreProbability = isCoreProbability;
+//	}
 	
 }

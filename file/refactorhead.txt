@@ -1,0 +1,9 @@
+@attribute 'ExtractMethod' numeric
+@attribute 'InlineMethod' numeric
+@attribute 'AddParameter' numeric
+@attribute 'EncapsulateField' numeric
+@attribute 'InlineTemp' numeric
+@attribute 'IntroduceAssertion' numeric
+@attribute 'RemoveParameter' numeric
+@attribute 'RenameMethod' numeric
+@attribute 'ReplaceExceptionWithTest' numeric
