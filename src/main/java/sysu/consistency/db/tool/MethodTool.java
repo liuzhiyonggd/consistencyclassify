@@ -16,17 +16,17 @@ public class MethodTool {
 		method.setProject((String)obj.get("project"));
 		method.setCommitID((String)obj.get("commit_id"));
 		method.setClassName((String)obj.get("class_name"));
-		method.setMethodID((int)obj.get("method_id"));
+		method.setMethodID((Integer)obj.get("method_id"));
 		method.setNewMethodName((String)obj.get("new_method_name"));
 		method.setOldMethodName((String)obj.get("old_method_name"));
 		method.setNewParameters((List<String>)obj.get("new_parameters"));
 		method.setOldParameters((List<String>)obj.get("old_parameters"));
 		method.setNewReturnType((String)obj.get("new_return_type"));
 		method.setOldReturnType((String)obj.get("old_return_type"));
-		method.setNewStartLine((int)obj.get("new_start_line"));
-		method.setNewEndLine((int)obj.get("new_end_line"));
-		method.setOldStartLine((int)obj.get("old_start_line"));
-		method.setOldEndLine((int)obj.get("old_end_line"));
+		method.setNewStartLine((Integer)obj.get("new_start_line"));
+		method.setNewEndLine((Integer)obj.get("new_end_line"));
+		method.setOldStartLine((Integer)obj.get("old_start_line"));
+		method.setOldEndLine((Integer)obj.get("old_end_line"));
 		method.setDiffList(DBObjectList2DiffTypeList((List<DBObject>)obj.get("diffs")));
 		
 		return method;
@@ -95,10 +95,10 @@ public class MethodTool {
 	public static DiffType DBObject2DiffType(DBObject obj){
 		DiffType diff = new DiffType();
 		diff.setType((String)obj.get("type"));
-		diff.setNewStartLine((int)obj.get("new_start_line"));
-		diff.setNewEndLine((int)obj.get("new_end_line"));
-		diff.setOldStartLine((int)obj.get("old_start_line"));
-		diff.setOldEndLine((int)obj.get("old_end_line"));
+		diff.setNewStartLine((Integer)obj.get("new_start_line"));
+		diff.setNewEndLine((Integer)obj.get("new_end_line"));
+		diff.setOldStartLine((Integer)obj.get("old_start_line"));
+		diff.setOldEndLine((Integer)obj.get("old_end_line"));
 		diff.setNewKeywordList((List<String>)obj.get("new_keywords"));
 		diff.setOldKeywordList((List<String>)obj.get("old_keywords"));
 		return diff;

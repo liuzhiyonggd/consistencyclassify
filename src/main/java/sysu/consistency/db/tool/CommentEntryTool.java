@@ -100,7 +100,7 @@ public class CommentEntryTool {
 		entry.setProject((String) obj.get("project"));
 		entry.setCommitID((String) obj.get("commit_id"));
 		entry.setClassName((String) obj.get("class_name"));
-		entry.setCommentID((int) obj.get("comment_id"));
+		entry.setCommentID((Integer) obj.get("comment_id"));
 		entry.setType((String) obj.get("type"));
 		entry.setNewCode((List<String>) obj.get("new_code"));
 		entry.setOldCode((List<String>) obj.get("old_code"));
@@ -108,21 +108,21 @@ public class CommentEntryTool {
 		entry.setOldComment((List<String>) obj.get("old_comment"));
 		entry.setNewToken(DBObjectList2TokenList((List<DBObject>)obj.get("new_token")));
 		entry.setOldToken(DBObjectList2TokenList((List<DBObject>)obj.get("old_token")));
-		entry.setChange((boolean) obj.get("ischange"));
-		entry.setChange2((boolean)obj.get("ischange2"));
+		entry.setChange((Boolean) obj.get("ischange"));
+		entry.setChange2((Boolean)obj.get("ischange2"));
 		entry.setDiffList(DBObjectList2DiffTypeList((List<DBObject>) obj.get("diffs")));
-		entry.setNew_comment_startLine((int)obj.get("new_comment_startline"));
-		entry.setNew_comment_endLine((int)obj.get("new_comment_endline"));
-		entry.setOld_comment_startLine((int)obj.get("old_comment_startline"));
-		entry.setOld_comment_endLine((int)obj.get("old_comment_endline"));
-		entry.setNew_scope_startLine((int)obj.get("new_scope_startline"));
-		entry.setNew_scope_endLine((int)obj.get("new_scope_endline"));
-		entry.setOld_scope_startLine((int)obj.get("old_scope_startline"));
-		entry.setOld_scope_endLine((int)obj.get("old_scope_endline"));
-		entry.setIsChangeProbability((double)obj.get("ischange_probability"));
-		entry.setVerify((boolean)obj.get("isverify"));	
+		entry.setNew_comment_startLine((Integer)obj.get("new_comment_startline"));
+		entry.setNew_comment_endLine((Integer)obj.get("new_comment_endline"));
+		entry.setOld_comment_startLine((Integer)obj.get("old_comment_startline"));
+		entry.setOld_comment_endLine((Integer)obj.get("old_comment_endline"));
+		entry.setNew_scope_startLine((Integer)obj.get("new_scope_startline"));
+		entry.setNew_scope_endLine((Integer)obj.get("new_scope_endline"));
+		entry.setOld_scope_startLine((Integer)obj.get("old_scope_startline"));
+		entry.setOld_scope_endLine((Integer)obj.get("old_scope_endline"));
+		entry.setIsChangeProbability((Double)obj.get("ischange_probability"));
+		entry.setVerify((Boolean)obj.get("isverify"));	
 		if(obj.get("refactor1")!=null){
-			entry.setRefactor1((boolean)obj.get("refactor1"));
+			entry.setRefactor1((Boolean)obj.get("refactor1"));
 		}else{
 			entry.setRefactor1(false);
 		}
@@ -147,9 +147,9 @@ public class CommentEntryTool {
 		
 		token.setTokenName((String)obj.get("token_name"));
 		token.setKeyword((String)obj.get("keyword"));
-		token.setStartLine((int)obj.get("start_line"));
-		token.setEndLine((int)obj.get("end_line"));
-		token.setHashNumber((int)obj.get("hash_number"));
+		token.setStartLine((Integer)obj.get("start_line"));
+		token.setEndLine((Integer)obj.get("end_line"));
+		token.setHashNumber((Integer)obj.get("hash_number"));
 
 		return token;
 	}
@@ -166,10 +166,10 @@ public class CommentEntryTool {
 	public static DiffType DBObject2DiffType(DBObject obj){
 		DiffType diff = new DiffType();
 		diff.setType((String)obj.get("type"));
-		diff.setNewStartLine((int)obj.get("new_start_line"));
-		diff.setNewEndLine((int)obj.get("new_end_line"));
-		diff.setOldStartLine((int)obj.get("old_start_line"));
-		diff.setOldEndLine((int)obj.get("old_end_line"));
+		diff.setNewStartLine((Integer)obj.get("new_start_line"));
+		diff.setNewEndLine((Integer)obj.get("new_end_line"));
+		diff.setOldStartLine((Integer)obj.get("old_start_line"));
+		diff.setOldEndLine((Integer)obj.get("old_end_line"));
 		diff.setNewKeywordList((List<String>)obj.get("new_keywords"));
 		diff.setOldKeywordList((List<String>)obj.get("old_keywords"));
 		return diff;

@@ -20,7 +20,7 @@ public class Apriori
      */  
     public Map<String, Integer> apriori(ArrayList<String> dataList)  
     {  
-        Map<String, Integer> stepFrequentSetMap = new HashMap<>();  
+        Map<String, Integer> stepFrequentSetMap = new HashMap<String, Integer>();  
         stepFrequentSetMap.putAll(findFrequentOneSets(dataList));  
           
         Map<String, Integer> frequentSetMap = new HashMap<String, Integer>();//Ƶ���  
@@ -75,7 +75,7 @@ public class Apriori
      */  
     private Map<String, Integer> findFrequentOneSets(ArrayList<String> dataList)  
     {  
-        Map<String, Integer> resultSetMap = new HashMap<>();  
+        Map<String, Integer> resultSetMap = new HashMap<String, Integer>();  
           
         for(String data:dataList)  
         {  
@@ -102,7 +102,7 @@ public class Apriori
      */  
     private Map<String, Integer> aprioriGen(Map<String, Integer> setMap)  
     {  
-        Map<String, Integer> candidateSetMap = new HashMap<>();  
+        Map<String, Integer> candidateSetMap = new HashMap<String, Integer>();  
           
         Set<String> candidateSet = setMap.keySet();  
         for(String s1:candidateSet)  
@@ -180,7 +180,7 @@ public class Apriori
      */  
     public Map<String, Double> getRelationRules(Map<String, Integer> frequentSetMap)  
     {  
-        Map<String, Double> relationsMap = new HashMap<>();  
+        Map<String, Double> relationsMap = new HashMap<String, Double>();  
         Set<String> keySet = frequentSetMap.keySet();  
   
         for(String key:keySet)  
@@ -215,7 +215,7 @@ public class Apriori
      */  
     private List<String> subset(String sourceSet)  
     {  
-        List<String> result = new ArrayList<>();  
+        List<String> result = new ArrayList<String>();  
           
         String[] strings = sourceSet.split(ITEM_SPLIT);  
         //�ǿ����Ӽ�  

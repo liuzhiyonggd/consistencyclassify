@@ -35,10 +35,10 @@ public class UpdateMethodDiff {
 			DBCursor cursor = methods.find(query);
 			
 			for(DBObject obj:cursor){
-				int methodOldStartLine = (int)obj.get("old_start_line");
-				int methodOldEndLine = (int)obj.get("old_end_line");
-				int methodNewStartLine = (int)obj.get("new_start_line");
-				int methodNewEndLine = (int)obj.get("new_end_line");
+				int methodOldStartLine = (Integer)obj.get("old_start_line");
+				int methodOldEndLine = (Integer)obj.get("old_end_line");
+				int methodNewStartLine = (Integer)obj.get("new_start_line");
+				int methodNewEndLine = (Integer)obj.get("new_end_line");
 				
 				List<DBObject> methodDiffList = new ArrayList<DBObject>();
 				for(DiffType diff:diffList){
