@@ -6,7 +6,7 @@ import java.util.List;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-@Document(collection="comment3")
+@Document(collection="comment5")
 public class CommentEntry {
 	
 	private String project;

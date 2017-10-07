@@ -1,2 +1,5 @@
 eclipse.preferences.version=1
 encoding//src/main/java/sysu/consistency/classify/data/DataSet.java=UTF-8
+encoding//src/main/java/sysu/consistency/db/extract/BlockExtractor.java=UTF-8
+encoding//src/main/java/sysu/consistency/db/extract/LineExtractor.java=UTF-8
+encoding//src/main/java/sysu/consistency/download/github/Download.java=UTF-8

@@ -36,12 +36,12 @@ public class LineExtractor {
 		List<ClassMessage> classList = classRepository.findByProject(project);
 		for(ClassMessage clazz:classList){
 			
-			//ֻ��ȡ�޸ĵ���
+			//只锟斤拷取锟睫改碉拷锟斤拷
 			if(clazz.getType().equals("new")||clazz.getType().equals("delete")){
 				continue;
 			}
 			
-			//����diff�б�Ϊ�յ��࣬����
+			//锟斤拷锟斤拷diff锟叫憋拷为锟秸碉拷锟洁，锟斤拷锟斤拷
 			if(clazz.getDiffList().isEmpty()){
 				continue;
 			}
@@ -61,7 +61,7 @@ public class LineExtractor {
 				newCodes.append(line.getLine()+"\n");
 			}
 			
-			//��ȡ������ķ����б�
+			//锟斤拷取锟斤拷锟斤拷锟斤拷姆锟斤拷锟斤拷斜锟�
 			ASTParser parser = ASTParser.newParser(AST.JLS3);
 			parser.setSource(oldCodes.toString().toCharArray());
 			CompilationUnit oldUnit = (CompilationUnit)parser.createAST(null);
@@ -93,7 +93,7 @@ public class LineExtractor {
 				}
 			}
 			
-			//��ɾ���ķ����������ķ����漰��ע�ʹ��б���ɾ��
+			//锟斤拷删锟斤拷锟侥凤拷锟斤拷锟斤拷锟斤拷锟斤拷锟侥凤拷锟斤拷锟芥及锟斤拷注锟酵达拷锟叫憋拷锟斤拷删锟斤拷
 			for(DiffType diff:diffList){
 				if (diff.getType().equals("ADDITIONAL_FUNCTIONALITY")) {
 					removeMethod(newMethodList, newUnit,diff.getNewStartLine());
@@ -105,7 +105,7 @@ public class LineExtractor {
 			List<CodeComment> newCommentList_temp = clazz.getNewComment();
 			List<CodeComment> oldCommentList_temp = clazz.getOldComment();
 			
-			//���˵���ע��
+			//锟斤拷锟剿碉拷锟斤拷注锟斤拷
 			List<Token> newTokenList = clazz.getNewTokenList();
 			for(int i=0,n=newCommentList_temp.size();i<n;i++){
 				CodeComment newComment = newCommentList_temp.get(i);
@@ -144,7 +144,7 @@ public class LineExtractor {
 				continue;
 			}
 			
-			//�Է���Ϊ���ַ�Χ�����¾�ע��ƥ��
+			//锟皆凤拷锟斤拷为锟斤拷锟街凤拷围锟斤拷锟斤拷锟铰撅拷注锟斤拷匹锟斤拷
 			for(int i=0,n=newMethodList.size();i<n;i++){
 				MethodDeclaration newMethod = newMethodList.get(i);
 				MethodDeclaration oldMethod = oldMethodList.get(i);
@@ -173,7 +173,7 @@ public class LineExtractor {
 					}
 				}
 				
-				//�ϲ����ڵ�ע��
+				//锟较诧拷锟斤拷锟节碉拷注锟斤拷
 				for (int j = 0, m = newMethodCommentList.size(); j < m - 1; j++) {
 					CodeComment currentComment = newMethodCommentList.get(j);
 					CodeComment nextComment = newMethodCommentList.get(j + 1);
@@ -196,19 +196,19 @@ public class LineExtractor {
 						m--;
 					}
 				}
-				//��ȡLineע���б���ɾ�������ĺ�ɾ����ע��
+				//锟斤拷取Line注锟斤拷锟叫憋拷锟斤拷删锟斤拷锟斤拷锟斤拷锟侥猴拷删锟斤拷锟斤拷注锟斤拷
 				for(int j=0,m=newMethodCommentList.size();j<m;j++){
 					CodeComment newComment = newMethodCommentList.get(j);
 					List<String> newCommentMessage = getCodeList(newCode,newComment.getStartLine(),newComment.getEndLine());
 					
-					//�����ע�ʹ����ע�ͣ�ɾ��
+					//锟斤拷锟斤拷锟阶拷痛锟斤拷锟斤拷注锟酵ｏ拷删锟斤拷
 					if(StringTools.isCode(newCommentMessage)){
 						newMethodCommentList.remove(j);
 						j--;
 						m--;
 					}else{
 						
-							//ɾ������ע�ͣ�����ע�ͺϲ��������ж��������ģ���ɾ����
+							//删锟斤拷锟斤拷锟斤拷注锟酵ｏ拷锟斤拷锟斤拷注锟酵合诧拷锟斤拷锟斤拷锟斤拷锟叫讹拷锟斤拷锟斤拷锟斤拷锟侥ｏ拷锟斤拷删锟斤拷锟斤拷
 							for(DiffType diff:diffList){
 								if(diff.getNewStartLine()==newComment.getStartLine()&&diff.getNewEndLine()==newComment.getEndLine()&&
 										(diff.getType().equals("COMMENT_INSERT")||diff.getType().equals("COMMENT_MOVE"))){
@@ -224,19 +224,19 @@ public class LineExtractor {
 					}
 				}
 				
-				//��ȡLineע���б���ɾ�������ĺ�ɾ����ע��
+				//锟斤拷取Line注锟斤拷锟叫憋拷锟斤拷删锟斤拷锟斤拷锟斤拷锟侥猴拷删锟斤拷锟斤拷注锟斤拷
 				for(int j=0,m=oldMethodCommentList.size();j<m;j++){
 					CodeComment oldComment = oldMethodCommentList.get(j);
 					List<String> oldCommentMessage = getCodeList(oldCode,oldComment.getStartLine(),oldComment.getEndLine());
 					
-					//�����ע�ʹ����ע�ͣ�ɾ��
+					//锟斤拷锟斤拷锟阶拷痛锟斤拷锟斤拷注锟酵ｏ拷删锟斤拷
 					if(StringTools.isCode(oldCommentMessage)){
 						oldMethodCommentList.remove(j);
 						j--;
 						m--;
 					}else{
 						
-							//ɾ������ע�ͣ�����ע�ͺϲ��������ж���ɾ���ģ���ɾ����
+							//删锟斤拷锟斤拷锟斤拷注锟酵ｏ拷锟斤拷锟斤拷注锟酵合诧拷锟斤拷锟斤拷锟斤拷锟叫讹拷锟斤拷删锟斤拷锟侥ｏ拷锟斤拷删锟斤拷锟斤拷
 							for(DiffType diff:diffList){
 								if(diff.getOldStartLine()==oldComment.getStartLine()&&diff.getOldEndLine()==oldComment.getEndLine()&&
 										(diff.getType().equals("COMMENT_DELETE")||diff.getType().equals("COMMENT_MOVE"))){
@@ -253,7 +253,7 @@ public class LineExtractor {
 				}
 				
 				if(newMoveCommentList.size()==oldMoveCommentList.size()){
-					//���ƶ���ע�����²���ע���б�
+					//锟斤拷锟狡讹拷锟斤拷注锟斤拷锟斤拷锟铰诧拷锟斤拷注锟斤拷锟叫憋拷
 					for(CodeComment comment:newMoveCommentList){
 						newMethodCommentList.add(comment);
 					}
@@ -283,7 +283,7 @@ public class LineExtractor {
 			}
 			
 			
-			//����ע�͵ķ�Χ
+			//锟斤拷锟斤拷注锟酵的凤拷围
 			int[] newLevels = CommentScopeTool.computeCommentLevels(newStatementList, newCommentList, newUnit);
 			for (int i = 0, n = newCommentList.size(); i < n; i++) {
 				CodeComment newComment = newCommentList.get(i);
@@ -296,9 +296,8 @@ public class LineExtractor {
 					}
 				}
 				newComment.setScopeEndLine(CommentScopeTool.computeCommentScope(newComment, i, newCommentList, newStatementList, 
-						newUnit,newLevels , methodEndLine));
+						newUnit,methodEndLine));
 			}
-			int[] oldLevels = CommentScopeTool.computeCommentLevels(oldStatementList, oldCommentList, oldUnit);
 			for (int i = 0, n = oldCommentList.size(); i < n; i++) {
 				CodeComment oldComment = oldCommentList.get(i);
 				int methodEndLine = -1;
@@ -310,7 +309,7 @@ public class LineExtractor {
 					}
 				}
 				oldComment.setScopeEndLine(CommentScopeTool.computeCommentScope(oldComment, i, oldCommentList, oldStatementList, 
-						oldUnit,oldLevels , methodEndLine));
+						oldUnit, methodEndLine));
 			}
 			
 			for(int i=0,n=newCommentList.size();i<n;i++){
@@ -333,7 +332,7 @@ public class LineExtractor {
 					continue;
 				}
 				
-				//����CommentEntry���󣬲����뵽���ݿ�comment3����
+				//锟斤拷锟斤拷CommentEntry锟斤拷锟襟，诧拷锟斤拷锟诫到锟斤拷锟捷匡拷comment3锟斤拷锟斤拷
 				CommentEntry comment = new CommentEntry();
 				comment.setProject(project);
 				comment.setCommitID(clazz.getCommitID());

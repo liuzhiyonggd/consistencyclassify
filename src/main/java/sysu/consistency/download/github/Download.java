@@ -31,14 +31,14 @@ public class Download {
 				"hibernate","spring","struts","commons-csv","commons-io","elasticsearch","maven","strman-java","tablesaw"
 				};
 		for(String str:projects){
-		    downloadCommitList(str);
+		    downloadCommitList("d:/git-repo",str);
 		    System.out.println(str+" is done.");
 		}
 		
 	}
 	
-	public static void downloadCommitList(String gitRepo) throws Exception{
-		Git git = Git.open(new File("D:/git-repo/"+gitRepo));
+	public static void downloadCommitList(String gitRepoLocated,String project) throws Exception{
+		Git git = Git.open(new File(gitRepoLocated+"/"+project));
 
 		Repository repository = git.getRepository();
 
@@ -46,7 +46,7 @@ public class Download {
 		ObjectId commitId = repository.resolve("refs/heads/master");
 		revWalk.markStart(revWalk.parseCommit(commitId));
 		RevCommit preCommit = null;
-		//commit����������->���˳��preCommitΪ��ǰcommit���°汾��commitΪ�ɰ汾
+		//commit遍历顺序为最新的commit到最旧的commit,preCommit为当前commit
 		for (RevCommit commit : revWalk) {
 			if(preCommit==null){
 				preCommit = commit;
@@ -61,7 +61,7 @@ public class Download {
 			commitBean.setCommitID2(preCommit.getId().toString());
 			commitBean.setAuthor(author);
 			commitBean.setMessage(message);
-			commitBean.setProject(gitRepo);
+			commitBean.setProject(project);
 			commitBean.setDate(new Date(((long)preCommit.getCommitTime())*1000));
 			
 			List<String> fileList = new ArrayList<String>();
@@ -87,9 +87,9 @@ public class Download {
 		}
 	}
 
-	//����commit��Ӧ��java��
-	public static void downloadCommit(String gitRepo) throws Exception {
-		Git git = Git.open(new File("D:/git-repo/"+gitRepo));
+	//下载commit中变化的java源代码
+	public static void downloadCommit(String gitRepoLocated,String project,String savePath) throws Exception {
+		Git git = Git.open(new File(gitRepoLocated+"/"+project));
 
 		Repository repository = git.getRepository();
 
@@ -98,7 +98,7 @@ public class Download {
 		revWalk.markStart(revWalk.parseCommit(commitId));
 		RevCommit preCommit = null;
 		
-		//commit����������->���˳��preCommitΪ��ǰcommit���°汾��commitΪ�ɰ汾
+		//commit遍历顺序为最新的commit到最旧的commit,preCommit为当前commit
 		for (RevCommit commit : revWalk) {
 			if(preCommit==null){
 				preCommit = commit;
@@ -112,7 +112,7 @@ public class Download {
 						ByteArrayOutputStream os = readFile(git, preCommit.getId(), diffEntry.getNewPath());
 						if (os != null) {
 							FileUtils.writeByteArrayToFile(
-									new File("D:/log/"+gitRepo+"/" + preCommit.getId() + "/new/" + diffEntry.getNewPath()),
+									new File(savePath+"/"+project+"/" + preCommit.getId() + "/new/" + diffEntry.getNewPath()),
 									os.toByteArray());
 						}
 					}
@@ -121,7 +121,7 @@ public class Download {
 						ByteArrayOutputStream os = readFile(git, commit.getId(), diffEntry.getOldPath());
 						if (os != null) {
 							FileUtils.writeByteArrayToFile(
-									new File("D:/log/"+gitRepo+"/" + preCommit.getId() + "/old/" + diffEntry.getOldPath()),
+									new File(savePath+"/"+project+"/" + preCommit.getId() + "/old/" + diffEntry.getOldPath()),
 									os.toByteArray());
 						}
 					}
@@ -130,14 +130,14 @@ public class Download {
 						ByteArrayOutputStream os = readFile(git, preCommit.getId(), diffEntry.getNewPath());
 						if (os != null) {
 							FileUtils.writeByteArrayToFile(
-									new File("D:/log/"+gitRepo+"/"+ preCommit.getId() + "/new/" + diffEntry.getNewPath()),
+									new File(savePath+"/"+project+"/"+ preCommit.getId() + "/new/" + diffEntry.getNewPath()),
 									os.toByteArray());
 						}
 						if (preCommit != null) {
 							os = readFile(git, commit.getId(), diffEntry.getOldPath());
 							if(os!=null){
 							    FileUtils.writeByteArrayToFile(
-									    new File("D:/log/"+gitRepo+"/"+ preCommit.getId() + "/old/" + diffEntry.getOldPath()),
+									    new File(savePath+"/"+project+"/"+ preCommit.getId() + "/old/" + diffEntry.getOldPath()),
 									    os.toByteArray());
 							}
 						}
@@ -149,7 +149,7 @@ public class Download {
 		}
 	}
 
-	//��ȡ�仯��java��
+	//获取java中变化的实体列表
 	private static List<DiffEntry> getDiffEntryList(Git git, ObjectId objId) throws Exception {
 
 		Repository repository = git.getRepository();
@@ -173,7 +173,7 @@ public class Download {
 		return diffEntries;
 	}
 
-	//���ָ��commit�����ļ�,���ֽ�����ʽ����
+	//读取文件
 	private static ByteArrayOutputStream readFile(Git git, ObjectId objId, String path) {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		Repository repository = null;
@@ -183,7 +183,6 @@ public class Download {
 			RevCommit revCommit = walk.parseCommit(objId);
 			RevTree revTree = revCommit.getTree();
 
-			// path��ʾ���git����ļ�·��
 			TreeWalk treeWalk = TreeWalk.forPath(repository, path, revTree);
 			if (treeWalk == null) {
 				return null;

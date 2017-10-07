@@ -48,7 +48,7 @@ public class DataSet {
 			data.add(vector);
 		}
 		
-		writeFile(data, savePath+"/common_data"+".txt");
+		writeFile(data, savePath+"/commonHibernate"+".txt");
 		System.out.println("write data file is done.");
 		}
 		
@@ -613,12 +613,12 @@ public class DataSet {
 	}
 	
 	public static void main(String[] args) throws IOException{
-//		DataSet.generateDataSet("file/idList.txt","dataset");
-		List<List<Integer>> vectorList1 = getVectorList4File("dataset/common_data.txt");
-		List<List<Integer>> vectorList2 = getVectorList4File("dataset/refactor_data.txt");
+		DataSet.generateDataSet("file/idList2.txt","dataset");
+		List<List<Integer>> vectorList1 = getVectorList4File("dataset/commonHibernate.txt");
+		List<List<Integer>> vectorList2 = getVectorList4File("dataset/refactorHibernate.txt");
 		List<List<Integer>> vectorList = combineVectors(vectorList1, vectorList2);
-		writeFile(vectorList, "file/data.arff");
-		writeFile(vectorList1,"file/data2.arff");
+		writeFile(vectorList, "file/data3.arff");
+		writeFile(vectorList1,"file/data4.arff");
 		
 		
 	}

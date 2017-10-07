@@ -85,7 +85,7 @@ public class CommentWordExtractor {
 	}
 	
 	public static void main(String[] args) throws IOException {
-		String[] projects = new String[]{"htmlunit","freecol","jamwiki","opennms","kablink"};
+		String[] projects = new String[]{"hibernate"};
 
 		for(String project : projects){
 			CommentWordExtractor.extract(project);

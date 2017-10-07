@@ -6,31 +6,30 @@ import java.util.List;
 import java.util.Queue;
 
 import org.eclipse.jdt.core.dom.Block;
+import org.eclipse.jdt.core.dom.CatchClause;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.Statement;
+import org.eclipse.jdt.core.dom.TryStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
 
 import sysu.consistency.db.bean.CodeComment;
 
+
+
 public class CommentScopeTool {
 
 	public static int computeCommentScope(CodeComment comment, int commentIndex, List<CodeComment> commentList,
-			List<Statement> statements, CompilationUnit unit, int[] commentLevels, int methodEndLine) {
+			List<Statement> statements, CompilationUnit unit, int methodEndLine) {
 
 		int scopeEndLine = methodEndLine;
 		int currentCommentStartLine = comment.getStartLine();
 		int currentCommentEndLine = comment.getEndLine();
 		int[] levels = computeCommentLevels(statements, commentList, unit);
 		int currentLevel = levels[commentIndex];
-		/*
-		 * Ѱ�ҵ�ǰcomment���ڵķ�����������comment�ķ�Χ ��Χȡ��һcomment����һ�кͷ��������е���Сֵ
-		 * ��comment�������У����䷶Χ����������ķ�Χ
-		 */
-
-		// ע���������ͬһ�е����
+		
 		boolean isCommentCodeSameLine = false;
 		Queue<Statement> queue = new LinkedList<Statement>();
 		List<Statement> staList = new ArrayList<Statement>();
@@ -55,7 +54,6 @@ public class CommentScopeTool {
 		if (!isCommentCodeSameLine) {
 			CodeComment nextComment = null;
 
-			// Ѱ���뵱ǰComment���ڵ���һ��Comment��ȥ�����������
 			for (int i = 0, n = commentList.size(); i < n; i++) {
 				if (commentList.get(i).getStartLine() > comment.getStartLine() && levels[i] == currentLevel) {
 					nextComment = commentList.get(i);
@@ -63,7 +61,7 @@ public class CommentScopeTool {
 				}
 			}
 
-			int nextCommentStartLine = 10000;// ������һ��comment����nextComment��startLineΪ�����
+			int nextCommentStartLine = Integer.MAX_VALUE;
 			if (nextComment != null) {
 				nextCommentStartLine = nextComment.getStartLine();
 			}
@@ -117,61 +115,94 @@ public class CommentScopeTool {
 			IfStatement ifStatement = (IfStatement) statement;
 			Statement thenStatement = ifStatement.getThenStatement();
 			List<Statement> statementList = new ArrayList<Statement>();
+			statementList.add(thenStatement);
 			if (thenStatement instanceof Block) {
 				Block block = (Block) thenStatement;
 				statementList.addAll(block.statements());
-			} else {
-				statementList.add(thenStatement);
 			}
 			Statement elseStatement = ifStatement.getElseStatement();
+			if(elseStatement!=null) {
+				statementList.add(elseStatement);
+			}
 			if (elseStatement instanceof Block) {
 				Block block = (Block) elseStatement;
 				statementList.addAll(block.statements());
-			} else {
-				if (elseStatement != null) {
-					statementList.add(elseStatement);
-				}
 			}
+			
 			return statementList;
 		}
 
 		if (statement instanceof WhileStatement) {
 			WhileStatement whileStatement = (WhileStatement) statement;
 			Statement whileBody = whileStatement.getBody();
+			List<Statement> statementList = new ArrayList<Statement>();
+			statementList.add(whileBody);
 			if (whileBody instanceof Block) {
 				Block block = (Block) whileBody;
-				return block.statements();
-			} else {
-				List<Statement> statementList = new ArrayList<Statement>();
-				statementList.add(whileBody);
-				return statementList;
-			}
+				statementList.addAll(block.statements());
+			} 
+			return statementList;
+			
 		}
 
 		if (statement instanceof ForStatement) {
 			ForStatement forStatement = (ForStatement) statement;
 			Statement forBody = forStatement.getBody();
+			List<Statement> statementList = new ArrayList<Statement>();
+			statementList.add(forBody);
 			if (forBody instanceof Block) {
 				Block block = (Block) forBody;
-				return block.statements();
-			} else {
-				List<Statement> statementList = new ArrayList<Statement>();
-				statementList.add(forBody);
-				return statementList;
-			}
+				statementList.addAll(block.statements());
+			} 
+			return statementList;
 		}
 
 		if (statement instanceof EnhancedForStatement) {
 			EnhancedForStatement forStatement = (EnhancedForStatement) statement;
 			Statement forBody = forStatement.getBody();
+			List<Statement> statementList = new ArrayList<Statement>();
+			statementList.add(forBody);
 			if (forBody instanceof Block) {
 				Block block = (Block) forBody;
-				return block.statements();
-			} else {
-				List<Statement> statementList = new ArrayList<Statement>();
-				statementList.add(forBody);
-				return statementList;
+				statementList.addAll(block.statements());
+			} 
+			return statementList;
+		}
+		
+		if(statement instanceof TryStatement) {
+			TryStatement tryStatement = (TryStatement)statement;
+			Statement tryBody = tryStatement.getBody();
+			List<Statement> statementList = new ArrayList<Statement>();
+			if(tryBody!=null) {
+			    statementList.add(tryBody);
 			}
+			if(tryBody instanceof Block) {
+				Block block = (Block)tryBody;
+				statementList.addAll(block.statements());
+			}
+			List<CatchClause> catchClauses = tryStatement.catchClauses();
+			if(catchClauses!=null&&catchClauses.size()>0) {
+				for(CatchClause clause:catchClauses) {
+					Statement sta = clause.getBody();
+					if(sta!=null) {
+						statementList.add(sta);
+					}
+					if(sta instanceof Block) {
+						Block block = (Block)sta;
+						statementList.addAll(block.statements());
+					}
+				}
+			}
+			
+			Statement finallyBody = tryStatement.getFinally();
+			if(finallyBody!=null) {
+				statementList.add(finallyBody);
+			}
+			if(finallyBody instanceof Block) {
+				Block block = (Block)finallyBody;
+				statementList.addAll(block.statements());
+			}
+			return statementList;
 		}
 		return new ArrayList<Statement>();
 	}

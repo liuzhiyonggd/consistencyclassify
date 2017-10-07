@@ -8,7 +8,7 @@ import com.mongodb.Mongo;
 
 public class CommitDAO {
 	
-	private static DB db = new Mongo("222.200.182.28",27017).getDB("commitbase");
+	private static DB db = new Mongo("192.168.2.168",27017).getDB("commitbase");
 	private static DBCollection commits = db.getCollection("commit2");
 	
 	public static DBObject Commit2DBObject(CommitBean commit){
