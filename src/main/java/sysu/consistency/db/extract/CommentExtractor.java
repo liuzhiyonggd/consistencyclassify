@@ -10,7 +10,7 @@ public class CommentExtractor {
 	public static void extract(String project){
 		JavadocExtractor.extract(project);
 		BlockExtractor.extract(project);
-		LineExtractor.extract(project);
+		LineExtractor.extract();
 	}
 	
 	public static void main(String[] args) throws IOException {

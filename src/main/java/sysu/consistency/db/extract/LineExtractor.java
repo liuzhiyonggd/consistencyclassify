@@ -29,15 +29,22 @@ public class LineExtractor {
 	private static int commentId = 1;
 
 	@SuppressWarnings("unchecked")
-	public static void extract(String project) {
+	public static void extract() {
 		int errorClassNum = 0;
 
 		ClassMessageRepository classRepository = RepositoryFactory.getClassRepository();
 		CommentRepository commentRepository = RepositoryFactory.getCommentRepository();
 
-		List<ClassMessage> classList = classRepository.findByProject(project);
-		for (ClassMessage clazz : classList) {
-
+		int count = 0;
+		for (int classID=1;classID<172438;classID++) {
+			count++;
+			if(count%10000==0) {
+				System.out.println(count + " is done.");
+			}
+			ClassMessage clazz = classRepository.findASingleByClassID(classID);
+			if(clazz==null) {
+				continue;
+			}
 			// 只关注change类型的类变化
 			if (clazz.getType().equals("new") || clazz.getType().equals("delete")) {
 				continue;
@@ -48,7 +55,7 @@ public class LineExtractor {
 				continue;
 			}
 
-			boolean isError = false;
+			
 
 			List<DiffType> diffList = clazz.getDiffList();
 			List<Line> oldCode = clazz.getOldCode();
@@ -94,15 +101,31 @@ public class LineExtractor {
 					}
 				}
 			}
-
-			// 去除新增的和删除的方法
-			for (DiffType diff : diffList) {
-				if (diff.getType().equals("ADDITIONAL_FUNCTIONALITY")) {
-					removeMethod(newMethodList, newUnit, diff.getNewStartLine());
-				} else if (diff.getType().equals("REMOVED_FUNCTIONALITY")) {
-					removeMethod(oldMethodList, oldUnit, diff.getOldStartLine());
+			
+			List<MethodDeclaration> tmp_newMethodList = new ArrayList<MethodDeclaration>();
+			List<MethodDeclaration> tmp_oldMethodList = new ArrayList<MethodDeclaration>();
+			for(MethodDeclaration newMethod:newMethodList) {
+				for(MethodDeclaration oldMethod:oldMethodList) {
+					if(compareMethod(newMethod, oldMethod)) {
+						tmp_newMethodList.add(newMethod);
+						tmp_oldMethodList.add(oldMethod);
+						break;
+					}
 				}
 			}
+			newMethodList = tmp_newMethodList;
+			oldMethodList = tmp_oldMethodList;
+			
+
+			
+			// 去除新增的和删除的方法
+//			for (DiffType diff : diffList) {
+//				if (diff.getType().equals("ADDITIONAL_FUNCTIONALITY")) {
+//					removeMethod(newMethodList, newUnit, diff.getNewStartLine());
+//				} else if (diff.getType().equals("REMOVED_FUNCTIONALITY")) {
+//					removeMethod(oldMethodList, oldUnit, diff.getOldStartLine());
+//				}
+//			}
 
 			List<CodeComment> newCommentList_temp = clazz.getNewComment();
 			List<CodeComment> oldCommentList_temp = clazz.getOldComment();
@@ -140,8 +163,17 @@ public class LineExtractor {
 			List<CodeComment> oldCommentList = new ArrayList<CodeComment>();
 
 			if (newMethodList.size() != oldMethodList.size()) {
+				
 				System.out.println("project:" + clazz.getProject() + " commit:" + clazz.getCommitID() + " class:"
-						+ clazz.getClassName() + "method list not equal.");
+						+ clazz.getClassName() + " method list not equal. old size:"+oldMethodList.size()+" new size:"+newMethodList.size());
+				
+				for(MethodDeclaration method:newMethodList) {
+					System.out.println(method.getName().toString());
+				}
+				System.out.println("-------------------");
+				for(MethodDeclaration method:oldMethodList) {
+					System.out.println(method.getName().toString());
+				}
 				errorClassNum++;
 				continue;
 			}
@@ -164,15 +196,13 @@ public class LineExtractor {
 				List<CodeComment> oldMoveCommentList = new ArrayList<CodeComment>();
 
 				for (CodeComment newComment : newCommentList_temp) {
-					if (newComment.getStartLine() > newMethodStartLine && newComment.getEndLine() <= newMethodEndLine
-							&& newComment.getType().toString().equals("Line")) {
+					if (newComment.getStartLine() > newMethodStartLine && newComment.getEndLine() <= newMethodEndLine) {
 						newMethodCommentList.add(newComment);
 					}
 				}
 
 				for (CodeComment oldComment : oldCommentList_temp) {
-					if (oldComment.getStartLine() > oldMethodStartLine && oldComment.getEndLine() <= oldMethodEndLine
-							&& oldComment.getType().toString().equals("Line")) {
+					if (oldComment.getStartLine() > oldMethodStartLine && oldComment.getEndLine() <= oldMethodEndLine) {
 						oldMethodCommentList.add(oldComment);
 					}
 				}
@@ -283,15 +313,10 @@ public class LineExtractor {
 							+ clazz.getClassName() + " method:" + newMethod.getName().getFullyQualifiedName() + " "
 							+ oldMethod.getName().getFullyQualifiedName() + " comment size not equal.");
 					System.out.println("new:" + newMethodCommentList.size() + " old:" + oldMethodCommentList.size());
-
-					isError = true;
 				}
 
 			}
 
-			if (isError) {
-				errorClassNum++;
-			}
 
 			for (int i = 0, n = newCommentList.size(); i < n; i++) {
 				CodeComment newComment = newCommentList.get(i);
@@ -352,7 +377,7 @@ public class LineExtractor {
 				commentId ++;
 				
 				
-				comment.setProject(project);
+				comment.setProject(clazz.getProject());
 				comment.setCommitID(clazz.getCommitID());
 				comment.setClassName(clazz.getClassName());
 				comment.setClassID(clazz.getClassID());
@@ -374,6 +399,7 @@ public class LineExtractor {
 						StringTools.computeSimilarity(comment.getNewComment(), comment.getOldComment()) < 0.95);
 
 				commentRepository.insert(comment);
+				System.out.println("insert.");
 			}
 
 		}
@@ -405,17 +431,34 @@ public class LineExtractor {
 		}
 		return codeList;
 	}
+	
+	private static boolean compareMethod(MethodDeclaration method1,MethodDeclaration method2) {
+		if(!method1.getName().toString().equals(method2.getName().toString())) {
+			return false;
+		}
+		List parameters1 = method1.parameters();
+		List parameters2 = method2.parameters();
+		
+		if(parameters1.size()!=parameters2.size()) {
+			return false;
+		}
+		
+		for(int i=0;i<parameters1.size();i++) {
+			String[] tmp = parameters1.get(i).toString().split(" ");
+			String type1 = tmp[0];
+			tmp = parameters2.get(i).toString().split(" ");
+			String type2 = tmp[0];
+			if(!type1.equals(type2)) {
+				return false;
+			}
+		}
+		return true;
+	}
 
 	public static void main(String[] args) {
 
-		String[] projects = new String[] { "jgit","hibernate","spring","struts","commons-csv","commons-io","elasticsearch","strman-java","tablesaw" };
-		DateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-		for (String project : projects) {
-
-			LineExtractor.extract(project);
-			System.out.println(project + " is done.");
-			System.out.println(sdf2.format(new Date()));
-		}
+//		String[] projects = new String[] { "jgit","hibernate","spring","struts","commons-csv","commons-io","elasticsearch","strman-java","tablesaw" };
+		LineExtractor.extract();
 	}
 
 }
