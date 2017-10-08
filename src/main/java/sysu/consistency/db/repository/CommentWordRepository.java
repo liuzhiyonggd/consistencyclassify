@@ -7,7 +7,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 import sysu.consistency.db.bean.CommentWord;
 
-public interface CommentWordRepository extends MongoRepository<CommentWord,ObjectId>{
+public interface CommentWordRepository extends MongoRepository<CommentWord,String>{
 	
 	List<CommentWord> findByProject(String project);
 	List<CommentWord> findByIschange(boolean ischange);

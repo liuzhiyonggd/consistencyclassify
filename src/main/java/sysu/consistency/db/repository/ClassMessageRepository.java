@@ -7,7 +7,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 import sysu.consistency.db.bean.ClassMessage;
 
-public interface ClassMessageRepository extends MongoRepository<ClassMessage,ObjectId>{
+public interface ClassMessageRepository extends MongoRepository<ClassMessage,String>{
 	
 	List<ClassMessage> findByProjectAndCommitID(String project,String commitID);
 	List<ClassMessage> findByProjectAndType(String project,String type);

@@ -3,11 +3,14 @@ package sysu.consistency.db.bean;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-@Document(collection="comment5")
+@Document(collection="comment6")
 public class CommentEntry {
+	@Id
+	private String id;
 	
 	private String project;
 	
@@ -16,6 +19,9 @@ public class CommentEntry {
 	
 	@Field("class_name")
 	private String className;
+	
+	@Field("class_id")
+	private int classID;
 	
 	@Field("comment_id")
 	private int commentID;
@@ -41,10 +47,10 @@ public class CommentEntry {
 	private List<Token> oldToken = new ArrayList<Token>();
 	
 	@Field("ischange")
-	private boolean isChange;
+	private boolean isChange=false;
 	
 	@Field("ischange2")
-	private boolean isChange2;
+	private boolean isChange2=false;
 	
 	@Field("diffs")
 	private List<DiffType> diffList = new ArrayList<DiffType>();
@@ -74,15 +80,23 @@ public class CommentEntry {
 	private int old_comment_endLine;
 	
 	@Field("isverify")
-	private boolean isVerify;
+	private boolean isVerify=false;
 	
 	@Field("ischange_probability")
-	private double isChangeProbability;
+	private double isChangeProbability=0d;
 	
-	private boolean refactor1;
-	private boolean refactor2;
-	private boolean refactor3;
-	private boolean refactor4;
+	private boolean refactor1=false;
+	private boolean refactor2=false;
+	private boolean refactor3=false;
+	private boolean refactor4=false;
+	private boolean refactor5=false;
+	private boolean refactor6=false;
+	private boolean refactor7=false;
+	private boolean refactor8=false;
+	private boolean refactor9=false;
+	private boolean refactor10=false;
+	private boolean refactor11=false;
+	private boolean refactor12=false;
 
 	public String getProject() {
 		return project;
@@ -253,6 +267,66 @@ public class CommentEntry {
 	}
 	public void setRefactor4(boolean refactor4) {
 		this.refactor4 = refactor4;
+	}
+	public String getId() {
+		return id;
+	}
+	public void setId(String id) {
+		this.id = id;
+	}
+	public int getClassID() {
+		return classID;
+	}
+	public void setClassID(int classID) {
+		this.classID = classID;
+	}
+	public boolean isRefactor5() {
+		return refactor5;
+	}
+	public void setRefactor5(boolean refactor5) {
+		this.refactor5 = refactor5;
+	}
+	public boolean isRefactor6() {
+		return refactor6;
+	}
+	public void setRefactor6(boolean refactor6) {
+		this.refactor6 = refactor6;
+	}
+	public boolean isRefactor7() {
+		return refactor7;
+	}
+	public void setRefactor7(boolean refactor7) {
+		this.refactor7 = refactor7;
+	}
+	public boolean isRefactor8() {
+		return refactor8;
+	}
+	public void setRefactor8(boolean refactor8) {
+		this.refactor8 = refactor8;
+	}
+	public boolean isRefactor9() {
+		return refactor9;
+	}
+	public void setRefactor9(boolean refactor9) {
+		this.refactor9 = refactor9;
+	}
+	public boolean isRefactor10() {
+		return refactor10;
+	}
+	public void setRefactor10(boolean refactor10) {
+		this.refactor10 = refactor10;
+	}
+	public boolean isRefactor11() {
+		return refactor11;
+	}
+	public void setRefactor11(boolean refactor11) {
+		this.refactor11 = refactor11;
+	}
+	public boolean isRefactor12() {
+		return refactor12;
+	}
+	public void setRefactor12(boolean refactor12) {
+		this.refactor12 = refactor12;
 	}
 	
 	

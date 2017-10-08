@@ -1,11 +1,14 @@
 package sysu.consistency.db.bean;
 import java.util.List;
 
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 @Document(collection="class_message2")
 public class ClassMessage {
+	@Id
+	private String id;
 
 	@Field("class_id")
 	private int classID;
@@ -119,6 +122,13 @@ public class ClassMessage {
 	public void setOldCode(List<Line> oldCode) {
 		this.oldCode = oldCode;
 	}
+	public String getId() {
+		return id;
+	}
+	public void setId(String id) {
+		this.id = id;
+	}
+	
 //	public double getIsCoreProbability() {
 //		return isCoreProbability;
 //	}

@@ -26,154 +26,158 @@ import sysu.consistency.tools.splitword.StringTools;
 
 public class LineExtractor {
 	
+	private static int commentId = 1;
+
 	@SuppressWarnings("unchecked")
-	public static void extract(String project){
+	public static void extract(String project) {
 		int errorClassNum = 0;
-		
+
 		ClassMessageRepository classRepository = RepositoryFactory.getClassRepository();
 		CommentRepository commentRepository = RepositoryFactory.getCommentRepository();
-		
+
 		List<ClassMessage> classList = classRepository.findByProject(project);
-		for(ClassMessage clazz:classList){
-			
-			//只锟斤拷取锟睫改碉拷锟斤拷
-			if(clazz.getType().equals("new")||clazz.getType().equals("delete")){
+		for (ClassMessage clazz : classList) {
+
+			// 只关注change类型的类变化
+			if (clazz.getType().equals("new") || clazz.getType().equals("delete")) {
 				continue;
 			}
-			
-			//锟斤拷锟斤拷diff锟叫憋拷为锟秸碉拷锟洁，锟斤拷锟斤拷
-			if(clazz.getDiffList().isEmpty()){
+
+			// 如果无代码层次的变化，则跳过
+			if (clazz.getDiffList().isEmpty()) {
 				continue;
 			}
-			
+
 			boolean isError = false;
-			
+
 			List<DiffType> diffList = clazz.getDiffList();
 			List<Line> oldCode = clazz.getOldCode();
 			List<Line> newCode = clazz.getNewCode();
-			
+
 			StringBuffer oldCodes = new StringBuffer();
-			for(Line line:oldCode){
-				oldCodes.append(line.getLine()+"\n");
+			for (Line line : oldCode) {
+				oldCodes.append(line.getLine() + "\n");
 			}
 			StringBuffer newCodes = new StringBuffer();
-			for(Line line:newCode){
-				newCodes.append(line.getLine()+"\n");
+			for (Line line : newCode) {
+				newCodes.append(line.getLine() + "\n");
 			}
-			
-			//锟斤拷取锟斤拷锟斤拷锟斤拷姆锟斤拷锟斤拷斜锟�
-			ASTParser parser = ASTParser.newParser(AST.JLS3);
+
+			// 获取新旧类的AST解析器
+			ASTParser parser = ASTParser.newParser(AST.JLS8);
 			parser.setSource(oldCodes.toString().toCharArray());
-			CompilationUnit oldUnit = (CompilationUnit)parser.createAST(null);
+			CompilationUnit oldUnit = (CompilationUnit) parser.createAST(null);
 			parser.setSource(newCodes.toString().toCharArray());
-			CompilationUnit newUnit =(CompilationUnit)parser.createAST(null);
+			CompilationUnit newUnit = (CompilationUnit) parser.createAST(null);
 
 			List<MethodDeclaration> newMethodList = new ArrayList<MethodDeclaration>();
 			List<MethodDeclaration> oldMethodList = new ArrayList<MethodDeclaration>();
-			
+
 			List<Statement> newStatementList = new ArrayList<Statement>();
 			List<Statement> oldStatementList = new ArrayList<Statement>();
-			for(TypeDeclaration newClass:(List<TypeDeclaration>)newUnit.types()){
+			for (TypeDeclaration newClass : (List<TypeDeclaration>) newUnit.types()) {
 				MethodDeclaration[] newMethods = newClass.getMethods();
-				for(MethodDeclaration method:newMethods){
+				for (MethodDeclaration method : newMethods) {
 					newMethodList.add(method);
-					if(method.getBody()!=null&&method.getBody().statements()!=null){
+					if (method.getBody() != null && method.getBody().statements() != null) {
 						newStatementList.addAll(method.getBody().statements());
 					}
 				}
 			}
-			
-			for(TypeDeclaration oldClass:(List<TypeDeclaration>)oldUnit.types()){
+
+			for (TypeDeclaration oldClass : (List<TypeDeclaration>) oldUnit.types()) {
 				MethodDeclaration[] oldMethods = oldClass.getMethods();
-				for(MethodDeclaration method:oldMethods){
+				for (MethodDeclaration method : oldMethods) {
 					oldMethodList.add(method);
-					if(method.getBody()!=null&&method.getBody().statements()!=null){
+					if (method.getBody() != null && method.getBody().statements() != null) {
 						oldStatementList.addAll(method.getBody().statements());
 					}
 				}
 			}
-			
-			//锟斤拷删锟斤拷锟侥凤拷锟斤拷锟斤拷锟斤拷锟斤拷锟侥凤拷锟斤拷锟芥及锟斤拷注锟酵达拷锟叫憋拷锟斤拷删锟斤拷
-			for(DiffType diff:diffList){
+
+			// 去除新增的和删除的方法
+			for (DiffType diff : diffList) {
 				if (diff.getType().equals("ADDITIONAL_FUNCTIONALITY")) {
-					removeMethod(newMethodList, newUnit,diff.getNewStartLine());
+					removeMethod(newMethodList, newUnit, diff.getNewStartLine());
 				} else if (diff.getType().equals("REMOVED_FUNCTIONALITY")) {
-					removeMethod(oldMethodList, oldUnit,diff.getOldStartLine());
+					removeMethod(oldMethodList, oldUnit, diff.getOldStartLine());
 				}
 			}
-			
+
 			List<CodeComment> newCommentList_temp = clazz.getNewComment();
 			List<CodeComment> oldCommentList_temp = clazz.getOldComment();
-			
-			//锟斤拷锟剿碉拷锟斤拷注锟斤拷
+
+			// 去除与代码在同一行的注释
 			List<Token> newTokenList = clazz.getNewTokenList();
-			for(int i=0,n=newCommentList_temp.size();i<n;i++){
+			for (int i = 0, n = newCommentList_temp.size(); i < n; i++) {
 				CodeComment newComment = newCommentList_temp.get(i);
-				for(Token token:newTokenList){
-					if(token.getStartLine()==newComment.getStartLine()&&token.getEndLine()==newComment.getEndLine()){
+				for (Token token : newTokenList) {
+					if (token.getStartLine() == newComment.getStartLine()
+							&& token.getEndLine() == newComment.getEndLine()) {
 						newCommentList_temp.remove(i);
 						i--;
 						n--;
 						break;
 					}
-			    }
+				}
 			}
-			
+
 			List<Token> oldTokenList = clazz.getOldTokenList();
-			for(int i=0,n=oldCommentList_temp.size();i<n;i++){
+			for (int i = 0, n = oldCommentList_temp.size(); i < n; i++) {
 				CodeComment oldComment = oldCommentList_temp.get(i);
-				for(Token token:oldTokenList){
-					if(token.getStartLine()==oldComment.getStartLine()&&token.getEndLine()==oldComment.getEndLine()){
+				for (Token token : oldTokenList) {
+					if (token.getStartLine() == oldComment.getStartLine()
+							&& token.getEndLine() == oldComment.getEndLine()) {
 						oldCommentList_temp.remove(i);
 						i--;
 						n--;
 						break;
 					}
-			    }
+				}
 			}
-			
+
 			List<CodeComment> newCommentList = new ArrayList<CodeComment>();
 			List<CodeComment> oldCommentList = new ArrayList<CodeComment>();
-			
-			
-			
-			if(newMethodList.size()!=oldMethodList.size()){
-				System.out.println("project:"+clazz.getProject()+" commit:"+clazz.getCommitID()+" class:"+clazz.getClassName()
-				+"method list not equal.");
+
+			if (newMethodList.size() != oldMethodList.size()) {
+				System.out.println("project:" + clazz.getProject() + " commit:" + clazz.getCommitID() + " class:"
+						+ clazz.getClassName() + "method list not equal.");
 				errorClassNum++;
 				continue;
 			}
-			
-			//锟皆凤拷锟斤拷为锟斤拷锟街凤拷围锟斤拷锟斤拷锟铰撅拷注锟斤拷匹锟斤拷
-			for(int i=0,n=newMethodList.size();i<n;i++){
+
+			// 以方法为划分界限，获取方法内部的注释
+			for (int i = 0, n = newMethodList.size(); i < n; i++) {
 				MethodDeclaration newMethod = newMethodList.get(i);
 				MethodDeclaration oldMethod = oldMethodList.get(i);
-				
+
 				int newMethodStartLine = newUnit.getLineNumber(newMethod.getStartPosition());
-				int newMethodEndLine = newUnit.getLineNumber(newMethod.getStartPosition()+newMethod.getLength()-1);
-				
+				int newMethodEndLine = newUnit.getLineNumber(newMethod.getStartPosition() + newMethod.getLength() - 1);
+
 				int oldMethodStartLine = oldUnit.getLineNumber(oldMethod.getStartPosition());
-				int oldMethodEndLine = oldUnit.getLineNumber(oldMethod.getStartPosition()+oldMethod.getLength()-1);
-				
+				int oldMethodEndLine = oldUnit.getLineNumber(oldMethod.getStartPosition() + oldMethod.getLength() - 1);
+
 				List<CodeComment> newMethodCommentList = new ArrayList<CodeComment>();
 				List<CodeComment> oldMethodCommentList = new ArrayList<CodeComment>();
-				
+
 				List<CodeComment> newMoveCommentList = new ArrayList<CodeComment>();
 				List<CodeComment> oldMoveCommentList = new ArrayList<CodeComment>();
-				
-				for(CodeComment newComment : newCommentList_temp){
-					if(newComment.getStartLine()>newMethodStartLine&&newComment.getEndLine()<=newMethodEndLine&&newComment.getType().toString().equals("Line")){
+
+				for (CodeComment newComment : newCommentList_temp) {
+					if (newComment.getStartLine() > newMethodStartLine && newComment.getEndLine() <= newMethodEndLine
+							&& newComment.getType().toString().equals("Line")) {
 						newMethodCommentList.add(newComment);
 					}
 				}
-				
-				for(CodeComment oldComment:oldCommentList_temp){
-					if(oldComment.getStartLine()>oldMethodStartLine&&oldComment.getEndLine()<=oldMethodEndLine&&oldComment.getType().toString().equals("Line")){
+
+				for (CodeComment oldComment : oldCommentList_temp) {
+					if (oldComment.getStartLine() > oldMethodStartLine && oldComment.getEndLine() <= oldMethodEndLine
+							&& oldComment.getType().toString().equals("Line")) {
 						oldMethodCommentList.add(oldComment);
 					}
 				}
-				
-				//锟较诧拷锟斤拷锟节碉拷注锟斤拷
+
+				// 合并多行注释
 				for (int j = 0, m = newMethodCommentList.size(); j < m - 1; j++) {
 					CodeComment currentComment = newMethodCommentList.get(j);
 					CodeComment nextComment = newMethodCommentList.get(j + 1);
@@ -196,147 +200,162 @@ public class LineExtractor {
 						m--;
 					}
 				}
-				//锟斤拷取Line注锟斤拷锟叫憋拷锟斤拷删锟斤拷锟斤拷锟斤拷锟侥猴拷删锟斤拷锟斤拷注锟斤拷
-				for(int j=0,m=newMethodCommentList.size();j<m;j++){
+
+				for (int j = 0, m = newMethodCommentList.size(); j < m; j++) {
 					CodeComment newComment = newMethodCommentList.get(j);
-					List<String> newCommentMessage = getCodeList(newCode,newComment.getStartLine(),newComment.getEndLine());
-					
-					//锟斤拷锟斤拷锟阶拷痛锟斤拷锟斤拷注锟酵ｏ拷删锟斤拷
-					if(StringTools.isCode(newCommentMessage)){
+					List<String> newCommentMessage = getCodeList(newCode, newComment.getStartLine(),
+							newComment.getEndLine());
+
+					// 去除代码注释
+					if (StringTools.isCode(newCommentMessage)) {
 						newMethodCommentList.remove(j);
 						j--;
 						m--;
-					}else{
-						
-							//删锟斤拷锟斤拷锟斤拷注锟酵ｏ拷锟斤拷锟斤拷注锟酵合诧拷锟斤拷锟斤拷锟斤拷锟叫讹拷锟斤拷锟斤拷锟斤拷锟侥ｏ拷锟斤拷删锟斤拷锟斤拷
-							for(DiffType diff:diffList){
-								if(diff.getNewStartLine()==newComment.getStartLine()&&diff.getNewEndLine()==newComment.getEndLine()&&
-										(diff.getType().equals("COMMENT_INSERT")||diff.getType().equals("COMMENT_MOVE"))){
-									newMethodCommentList.remove(j);
-									j--;
-									m--;
-									if(diff.getType().equals("COMMENT_MOVE")){
-										newMoveCommentList.add(newComment);
-									}
-									break;
+					} else {
+
+						// 在新版本中去除新增的和移动的注释
+						for (DiffType diff : diffList) {
+							if (diff.getNewStartLine() == newComment.getStartLine()
+									&& diff.getNewEndLine() == newComment.getEndLine()
+									&& (diff.getType().equals("COMMENT_INSERT")
+											|| diff.getType().equals("COMMENT_MOVE"))) {
+								newMethodCommentList.remove(j);
+								j--;
+								m--;
+								if (diff.getType().equals("COMMENT_MOVE")) {
+									newMoveCommentList.add(newComment);
 								}
+								break;
 							}
+						}
 					}
 				}
-				
-				//锟斤拷取Line注锟斤拷锟叫憋拷锟斤拷删锟斤拷锟斤拷锟斤拷锟侥猴拷删锟斤拷锟斤拷注锟斤拷
-				for(int j=0,m=oldMethodCommentList.size();j<m;j++){
+
+				// 与新版本的处理类似
+				for (int j = 0, m = oldMethodCommentList.size(); j < m; j++) {
 					CodeComment oldComment = oldMethodCommentList.get(j);
-					List<String> oldCommentMessage = getCodeList(oldCode,oldComment.getStartLine(),oldComment.getEndLine());
-					
-					//锟斤拷锟斤拷锟阶拷痛锟斤拷锟斤拷注锟酵ｏ拷删锟斤拷
-					if(StringTools.isCode(oldCommentMessage)){
+					List<String> oldCommentMessage = getCodeList(oldCode, oldComment.getStartLine(),
+							oldComment.getEndLine());
+
+					// 去除代码注释
+					if (StringTools.isCode(oldCommentMessage)) {
 						oldMethodCommentList.remove(j);
 						j--;
 						m--;
-					}else{
-						
-							//删锟斤拷锟斤拷锟斤拷注锟酵ｏ拷锟斤拷锟斤拷注锟酵合诧拷锟斤拷锟斤拷锟斤拷锟叫讹拷锟斤拷删锟斤拷锟侥ｏ拷锟斤拷删锟斤拷锟斤拷
-							for(DiffType diff:diffList){
-								if(diff.getOldStartLine()==oldComment.getStartLine()&&diff.getOldEndLine()==oldComment.getEndLine()&&
-										(diff.getType().equals("COMMENT_DELETE")||diff.getType().equals("COMMENT_MOVE"))){
-									oldMethodCommentList.remove(j);
-									j--;
-									m--;
-									if(diff.getType().equals("COMMENT_MOVE")){
-										oldMoveCommentList.add(oldComment);
-									}
-									break;
+					} else {
+
+						// 在旧版中去除删除的和移动的注释
+						for (DiffType diff : diffList) {
+							if (diff.getOldStartLine() == oldComment.getStartLine()
+									&& diff.getOldEndLine() == oldComment.getEndLine()
+									&& (diff.getType().equals("COMMENT_DELETE")
+											|| diff.getType().equals("COMMENT_MOVE"))) {
+								oldMethodCommentList.remove(j);
+								j--;
+								m--;
+								if (diff.getType().equals("COMMENT_MOVE")) {
+									oldMoveCommentList.add(oldComment);
 								}
+								break;
 							}
+						}
 					}
 				}
-				
-				if(newMoveCommentList.size()==oldMoveCommentList.size()){
-					//锟斤拷锟狡讹拷锟斤拷注锟斤拷锟斤拷锟铰诧拷锟斤拷注锟斤拷锟叫憋拷
-					for(CodeComment comment:newMoveCommentList){
+
+				if (newMoveCommentList.size() == oldMoveCommentList.size()) {
+					// 将移动的注释加到注释列表的尾部
+					for (CodeComment comment : newMoveCommentList) {
 						newMethodCommentList.add(comment);
 					}
-				
-					for(CodeComment comment:oldMoveCommentList){
+
+					for (CodeComment comment : oldMoveCommentList) {
 						oldMethodCommentList.add(comment);
 					}
-				}else{
+				} else {
 					System.out.println("move comment error.");
 				}
-				
-				if(newMethodCommentList.size()==oldMethodCommentList.size()){
+
+				if (newMethodCommentList.size() == oldMethodCommentList.size()) {
 					newCommentList.addAll(newMethodCommentList);
 					oldCommentList.addAll(oldMethodCommentList);
-				}else{
-					System.out.println("project:"+clazz.getProject()+" commit:"+clazz.getCommitID()+" class:"+clazz.getClassName()+
-							" method:"+newMethod.getName().getFullyQualifiedName()+" "+oldMethod.getName().getFullyQualifiedName()+" line comment size not equal.");
-					System.out.println("new:"+newMethodCommentList.size()+" old:"+oldMethodCommentList.size());
-					
+				} else {
+					System.out.println("project:" + clazz.getProject() + " commit:" + clazz.getCommitID() + " class:"
+							+ clazz.getClassName() + " method:" + newMethod.getName().getFullyQualifiedName() + " "
+							+ oldMethod.getName().getFullyQualifiedName() + " comment size not equal.");
+					System.out.println("new:" + newMethodCommentList.size() + " old:" + oldMethodCommentList.size());
+
 					isError = true;
 				}
-				
+
 			}
-			
-			if(isError){
+
+			if (isError) {
 				errorClassNum++;
 			}
-			
-			
-			//锟斤拷锟斤拷注锟酵的凤拷围
-			int[] newLevels = CommentScopeTool.computeCommentLevels(newStatementList, newCommentList, newUnit);
+
 			for (int i = 0, n = newCommentList.size(); i < n; i++) {
 				CodeComment newComment = newCommentList.get(i);
 				int methodEndLine = -1;
-				for(MethodDeclaration method:newMethodList){
-					if(newComment.getStartLine()>newUnit.getLineNumber(method.getStartPosition())&&
-							newComment.getStartLine()<newUnit.getLineNumber(method.getStartPosition()+method.getLength()-1)){
-						methodEndLine = newUnit.getLineNumber(method.getStartPosition()+method.getLength()-1);
+				for (MethodDeclaration method : newMethodList) {
+					if (newComment.getStartLine() > newUnit.getLineNumber(method.getStartPosition())
+							&& newComment.getStartLine() < newUnit
+									.getLineNumber(method.getStartPosition() + method.getLength() - 1)) {
+						methodEndLine = newUnit.getLineNumber(method.getStartPosition() + method.getLength() - 1);
 						break;
 					}
 				}
-				newComment.setScopeEndLine(CommentScopeTool.computeCommentScope(newComment, i, newCommentList, newStatementList, 
-						newUnit,methodEndLine));
+				newComment.setScopeEndLine(CommentScopeTool.computeCommentScope(newComment, i, newCommentList,
+						newStatementList, newUnit, methodEndLine));
 			}
 			for (int i = 0, n = oldCommentList.size(); i < n; i++) {
 				CodeComment oldComment = oldCommentList.get(i);
 				int methodEndLine = -1;
-				for(MethodDeclaration method:oldMethodList){
-					if(oldComment.getStartLine()>oldUnit.getLineNumber(method.getStartPosition())&&
-							oldComment.getStartLine()<oldUnit.getLineNumber(method.getStartPosition()+method.getLength()-1)){
-						methodEndLine = oldUnit.getLineNumber(method.getStartPosition()+method.getLength()-1);
+				for (MethodDeclaration method : oldMethodList) {
+					if (oldComment.getStartLine() > oldUnit.getLineNumber(method.getStartPosition())
+							&& oldComment.getStartLine() < oldUnit
+									.getLineNumber(method.getStartPosition() + method.getLength() - 1)) {
+						methodEndLine = oldUnit.getLineNumber(method.getStartPosition() + method.getLength() - 1);
 						break;
 					}
 				}
-				oldComment.setScopeEndLine(CommentScopeTool.computeCommentScope(oldComment, i, oldCommentList, oldStatementList, 
-						oldUnit, methodEndLine));
+				oldComment.setScopeEndLine(CommentScopeTool.computeCommentScope(oldComment, i, oldCommentList,
+						oldStatementList, oldUnit, methodEndLine));
 			}
-			
-			for(int i=0,n=newCommentList.size();i<n;i++){
+
+			for (int i = 0, n = newCommentList.size(); i < n; i++) {
 				CodeComment newComment = newCommentList.get(i);
 				CodeComment oldComment = oldCommentList.get(i);
-				
+
 				List<DiffType> commentDiffList = new ArrayList<DiffType>();
-				for(DiffType diff:diffList){
-					if((diff.getNewStartLine()>newComment.getStartLine()&&diff.getNewEndLine()<=newComment.getScopeEndLine()
-							&&diff.getOldStartLine()>oldComment.getStartLine()&&diff.getOldEndLine()<=oldComment.getScopeEndLine())
-							||(diff.getNewStartLine()>newComment.getStartLine()&&diff.getNewEndLine()<=newComment.getScopeEndLine()
-							&&diff.getOldStartLine()==0&&diff.getOldEndLine()==0)
-							||(diff.getOldStartLine()>oldComment.getStartLine()&&diff.getOldEndLine()<=oldComment.getScopeEndLine()
-							&&diff.getNewStartLine()==0&&diff.getNewEndLine()==0)){
+				for (DiffType diff : diffList) {
+					if ((diff.getNewStartLine() > newComment.getStartLine()
+							&& diff.getNewEndLine() <= newComment.getScopeEndLine()
+							&& diff.getOldStartLine() > oldComment.getStartLine()
+							&& diff.getOldEndLine() <= oldComment.getScopeEndLine())
+							|| (diff.getNewStartLine() > newComment.getStartLine()
+									&& diff.getNewEndLine() <= newComment.getScopeEndLine()
+									&& diff.getOldStartLine() == 0 && diff.getOldEndLine() == 0)
+							|| (diff.getOldStartLine() > oldComment.getStartLine()
+									&& diff.getOldEndLine() <= oldComment.getScopeEndLine()
+									&& diff.getNewStartLine() == 0 && diff.getNewEndLine() == 0)) {
 						commentDiffList.add(diff);
 					}
 				}
-				
-				if(commentDiffList.isEmpty()){
+
+				if (commentDiffList.isEmpty()) {
 					continue;
 				}
-				
-				//锟斤拷锟斤拷CommentEntry锟斤拷锟襟，诧拷锟斤拷锟诫到锟斤拷锟捷匡拷comment3锟斤拷锟斤拷
+
+				// 将注释插入到数据库中
 				CommentEntry comment = new CommentEntry();
+				comment.setCommentID(commentId);
+				commentId ++;
+				
+				
 				comment.setProject(project);
 				comment.setCommitID(clazz.getCommitID());
 				comment.setClassName(clazz.getClassName());
+				comment.setClassID(clazz.getClassID());
 				comment.setType(newComment.getType().toString());
 				comment.setNew_comment_startLine(newComment.getStartLine());
 				comment.setNew_comment_endLine(newComment.getEndLine());
@@ -346,54 +365,55 @@ public class LineExtractor {
 				comment.setOld_comment_endLine(oldComment.getEndLine());
 				comment.setOld_scope_startLine(oldComment.getStartLine());
 				comment.setOld_scope_endLine(oldComment.getScopeEndLine());
-				comment.setNewCode(getCodeList(newCode,newComment.getEndLine()+1,newComment.getScopeEndLine()));
-				comment.setOldCode(getCodeList(oldCode,oldComment.getEndLine()+1,oldComment.getScopeEndLine()));
-				comment.setNewComment(getCodeList(newCode,newComment.getStartLine(),newComment.getEndLine()));
-				comment.setOldComment(getCodeList(oldCode,oldComment.getStartLine(),oldComment.getEndLine()));
+				comment.setNewCode(getCodeList(newCode, newComment.getEndLine() + 1, newComment.getScopeEndLine()));
+				comment.setOldCode(getCodeList(oldCode, oldComment.getEndLine() + 1, oldComment.getScopeEndLine()));
+				comment.setNewComment(getCodeList(newCode, newComment.getStartLine(), newComment.getEndLine()));
+				comment.setOldComment(getCodeList(oldCode, oldComment.getStartLine(), oldComment.getEndLine()));
 				comment.setDiffList(commentDiffList);
-				comment.setChange(StringTools.computeSimilarity(comment.getNewComment(), comment.getOldComment())<0.95);
-				
+				comment.setChange(
+						StringTools.computeSimilarity(comment.getNewComment(), comment.getOldComment()) < 0.95);
+
 				commentRepository.insert(comment);
 			}
-			
+
 		}
-		System.out.println("error class num :"+errorClassNum);
-		
+		System.out.println("error class num :" + errorClassNum);
+
 	}
 
-	private static void removeMethod( List<MethodDeclaration> methodList, CompilationUnit unit, int startLine) {
-		
-		for(int i=0,n=methodList.size();i<n;i++){
+	private static void removeMethod(List<MethodDeclaration> methodList, CompilationUnit unit, int startLine) {
+
+		for (int i = 0, n = methodList.size(); i < n; i++) {
 			MethodDeclaration method = methodList.get(i);
 			int methodStartLine = unit.getLineNumber(method.getStartPosition());
-			if(methodStartLine==startLine){
+			if (methodStartLine == startLine) {
 				methodList.remove(i);
 				break;
 			}
 		}
-		
+
 	}
 
 	private static List<String> getCodeList(List<Line> newCode, int startLine, int endLine) {
-		
+
 		List<String> codeList = new ArrayList<String>();
-		if(startLine>endLine){
+		if (startLine > endLine) {
 			return codeList;
 		}
-		for(int i=startLine-1;i<endLine&&i<newCode.size();i++){
+		for (int i = startLine - 1; i < endLine && i < newCode.size(); i++) {
 			codeList.add(newCode.get(i).getLine());
 		}
 		return codeList;
 	}
 
 	public static void main(String[] args) {
-		
-		String[] projects = new String[]{"jhotdraw"};
+
+		String[] projects = new String[] { "jgit","hibernate","spring","struts","commons-csv","commons-io","elasticsearch","strman-java","tablesaw" };
 		DateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-		for(String project:projects){
-			
+		for (String project : projects) {
+
 			LineExtractor.extract(project);
-			System.out.println(project +" is done.");
+			System.out.println(project + " is done.");
 			System.out.println(sdf2.format(new Date()));
 		}
 	}

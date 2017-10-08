@@ -3,17 +3,22 @@ package sysu.consistency.db.bean;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
-@Document(collection="method")
+@Document(collection="method6")
 public class MethodBean {
 
+	@Id
+	private String id;
 	@Field("project")
 	private String project;
 	@Field("commit_id")
 	private String commitID;
 	@Field("class_name")
 	private String className;
+	@Field("class_id")
+	private int classID;
 	@Field("new_method_name")
 	private String newMethodName;
 	@Field("old_method_name")
@@ -128,6 +133,18 @@ public class MethodBean {
 	}
 	public void setDiffList(List<DiffType> diffList) {
 		this.diffList = diffList;
+	}
+	public String getId() {
+		return id;
+	}
+	public void setId(String id) {
+		this.id = id;
+	}
+	public int getClassID() {
+		return classID;
+	}
+	public void setClassID(int classID) {
+		this.classID = classID;
 	}
 	
 	
