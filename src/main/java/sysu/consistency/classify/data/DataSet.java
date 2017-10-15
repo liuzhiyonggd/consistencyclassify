@@ -30,9 +30,9 @@ public class DataSet {
 		
 		List<String> idList = FileUtils.readLines(new File(idFile), "UTF-8");
 		int count = 0;
-		for(String str:idList){
+		for(String id:idList){
 			
-			int i=Integer.parseInt(str);
+			int i=Integer.parseInt(id);
 			count++;
 			if(count%1000==0){
 				System.out.println(i +" is done.");
@@ -42,13 +42,31 @@ public class DataSet {
 				System.out.println(i +" is null.");
 				continue;
 			}
-			System.out.println("commit_id:"+comment.getCommitID());
+			
+			if(comment.getOldCode().size()>30) {
+				continue;
+			}
+			int newWordCount = 0;
+			int oldWordCount = 0;
+			for(String str:comment.getNewComment()) {
+				newWordCount += str.split(" ").length;
+			}
+			for(String str:comment.getOldComment()) {
+				oldWordCount += str.split(" ").length;
+			}
+			if(newWordCount>20||newWordCount<3) {
+				continue;
+			}
+			if(oldWordCount>20||oldWordCount<3) {
+				continue;
+			}
+			
 			List<Integer> vector = extractLineVector(comment);
 			
 			data.add(vector);
 		}
 		
-		writeFile(data, savePath+"/commonHibernate"+".txt");
+		writeFile(data, savePath+"/data3"+".txt");
 		System.out.println("write data file is done.");
 		}
 		
@@ -77,8 +95,8 @@ public class DataSet {
 			headerList.add("@attribute 'commentID' numeric");
 			
 			//2. comment project
-			vector.add(projects.get(comment.getProject()));
-			headerList.add("@attribute 'project' numeric");
+//			vector.add(projects.get(comment.getProject()));
+//			headerList.add("@attribute 'project' numeric");
 			
 			ClassMessage clazz = classRepository.findASingleByProjectAndCommitIDAndClassName(comment.getProject(), comment.getCommitID(),comment.getClassName());
 			List<Token> newTokenList = clazz.getNewTokenList();
@@ -397,7 +415,7 @@ public class DataSet {
 //			vector.addAll(keywordMap.get(comment.getCommentID()));
 
 
-			CommentWord commentWord = wordRepository.findASingleByCommentIDAndType(comment.getCommentID(), comment.getType());
+			CommentWord commentWord = wordRepository.findASingleByCommentID(comment.getCommentID());
 			
 			/**
 			 * 锟斤拷注锟斤拷锟斤拷锟斤拷
@@ -417,10 +435,10 @@ public class DataSet {
 			for(String str:comment.getOldCode()){
 				sb.append(str+" ");
 			}
-			String codes = sb.toString().toLowerCase();
-			boolean flag = codes.contains("todo")||codes.contains("fixme")||codes.contains("xxx");
-			vector.add(flag?1:0);
-			headerList.add("@attribute 'todos' numeric");
+//			String codes = sb.toString().toLowerCase();
+//			boolean flag = codes.contains("todo")||codes.contains("fixme")||codes.contains("xxx");
+//			vector.add(flag?1:0);
+//			headerList.add("@attribute 'todos' numeric");
 			
 			/**
 			 * 锟斤拷锟斤拷锟斤拷锟斤拷
@@ -459,7 +477,7 @@ public class DataSet {
 			FileUtils.writeLines(new File("file/commonhead.txt"), headerList);
 			
 			//37. ischange
-			vector.add(comment.isChange()?1:0);
+//			vector.add(comment.isChange2()?1:0);
 			
 			return vector;
 	}
@@ -613,12 +631,12 @@ public class DataSet {
 	}
 	
 	public static void main(String[] args) throws IOException{
-		DataSet.generateDataSet("file/idList2.txt","dataset");
-		List<List<Integer>> vectorList1 = getVectorList4File("dataset/commonHibernate.txt");
-		List<List<Integer>> vectorList2 = getVectorList4File("dataset/refactorHibernate.txt");
-		List<List<Integer>> vectorList = combineVectors(vectorList1, vectorList2);
-		writeFile(vectorList, "file/data3.arff");
-		writeFile(vectorList1,"file/data4.arff");
+		DataSet.generateDataSet("E:\\注释一致性实验\\数据\\selectID.txt","dataset");
+//		List<List<Integer>> vectorList1 = getVectorList4File("dataset/data.txt");
+//		List<List<Integer>> vectorList2 = getVectorList4File("dataset/refactorHibernate.txt");
+//		List<List<Integer>> vectorList = combineVectors(vectorList1, vectorList2);
+//		writeFile(vectorList, "file/data3.arff");
+//		writeFile(vectorList1,"file/data.arff");
 		
 		
 	}

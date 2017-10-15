@@ -82,6 +82,12 @@ public class CommentEntry {
 	@Field("isverify")
 	private boolean isVerify=false;
 	
+	@Field("filter1")
+	private boolean filter1 = false;//注释为描述性注释，注释单词数3-20之间，注释体代码行数小于30
+	
+	@Field("filter2")
+	private boolean filter2 = false;//随机从filter1中选取3000个
+	
 	@Field("ischange_probability")
 	private double isChangeProbability=0d;
 	
@@ -327,6 +333,18 @@ public class CommentEntry {
 	}
 	public void setRefactor12(boolean refactor12) {
 		this.refactor12 = refactor12;
+	}
+	public boolean isFilter1() {
+		return filter1;
+	}
+	public void setFilter1(boolean filter1) {
+		this.filter1 = filter1;
+	}
+	public boolean isFilter2() {
+		return filter2;
+	}
+	public void setFilter2(boolean filter2) {
+		this.filter2 = filter2;
 	}
 	
 	

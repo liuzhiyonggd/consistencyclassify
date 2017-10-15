@@ -12,19 +12,17 @@ import sysu.consistency.tools.splitword.WordSpliter;
 
 public class CommentWordExtractor {
 
-	public static void extract(String project) {
+	public static void extract() {
 
 		
 		CommentRepository commentRepository = RepositoryFactory.getCommentRepository();
 		CommentWordRepository commentWordRepository = RepositoryFactory.getCommentWordRepository();
-		List<CommentEntry> commentList = commentRepository.findByProject(project);
 		
 		
-		int i=0;
-		for (CommentEntry comment : commentList) {
-			i++;
-			if(i%1000==0){
-				System.out.println(project + " inserted "+i);
+		for (int commentID=1;commentID<48171;commentID++) {
+			CommentEntry comment = commentRepository.findASingleByCommentID(commentID);
+			if(commentID%1000==0){
+				System.out.println(" inserted "+commentID);
 			}
 			List<String> newComment = comment.getNewComment();
 			List<String> oldComment = comment.getOldComment();
@@ -72,8 +70,8 @@ public class CommentWordExtractor {
 			CommentWord commentWord = new CommentWord();
 			commentWord.setCommentID(comment.getCommentID());
 			commentWord.setType(comment.getType());
-			commentWord.setProject(project);
-			commentWord.setIschange(comment.isChange());
+			commentWord.setProject(comment.getProject());
+			commentWord.setIschange(comment.isChange2());
 			commentWord.setNewCommentWords(newCommentWordList);
 			commentWord.setOldCommentWords(oldCommentWordList);
 			commentWord.setNewCodeWords(newCodeWordList);
@@ -85,12 +83,8 @@ public class CommentWordExtractor {
 	}
 	
 	public static void main(String[] args) throws IOException {
-		String[] projects = new String[]{"hibernate"};
 
-		for(String project : projects){
-			CommentWordExtractor.extract(project);
-			System.out.println("project:"+project +" is done.");
-		}
+			CommentWordExtractor.extract();
 	}
 
 }

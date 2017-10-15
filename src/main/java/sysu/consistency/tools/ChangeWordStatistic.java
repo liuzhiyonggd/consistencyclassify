@@ -31,7 +31,7 @@ public class ChangeWordStatistic {
 				continue;
 			}
 			CommentEntry comment = commentRepo.findASingleByCommentID(i);
-			CommentWord word = wordRepo.findASingleByCommentIDAndType(i, "Line");
+			CommentWord word = wordRepo.findASingleByCommentID(i);
 			
 			if(comment.isChange2()){
 				continue;

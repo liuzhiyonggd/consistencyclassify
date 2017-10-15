@@ -36,7 +36,7 @@ public class LineExtractor {
 		CommentRepository commentRepository = RepositoryFactory.getCommentRepository();
 
 		int count = 0;
-		for (int classID=1;classID<172438;classID++) {
+		for (int classID=172439;classID<426138;classID++) {
 			count++;
 			if(count%10000==0) {
 				System.out.println(count + " is done.");
@@ -376,6 +376,20 @@ public class LineExtractor {
 				comment.setCommentID(commentId);
 				commentId ++;
 				
+				List<Token> newCommentTokenList = new ArrayList<Token>();
+				for(Token token:newTokenList) {
+					if(token.getStartLine()>=newComment.getStartLine()&&token.getEndLine()<=newComment.getScopeEndLine()) {
+						newCommentTokenList.add(token);
+					}
+				}
+				List<Token> oldCommentTokenList = new ArrayList<Token>();
+				for(Token token:oldTokenList) {
+					if(token.getStartLine()>=oldComment.getStartLine()&&token.getEndLine()<=oldComment.getScopeEndLine()) {
+						oldCommentTokenList.add(token);
+					}
+				}
+				comment.setNewToken(newCommentTokenList);
+				comment.setOldToken(oldCommentTokenList);
 				
 				comment.setProject(clazz.getProject());
 				comment.setCommitID(clazz.getCommitID());
@@ -399,7 +413,6 @@ public class LineExtractor {
 						StringTools.computeSimilarity(comment.getNewComment(), comment.getOldComment()) < 0.95);
 
 				commentRepository.insert(comment);
-				System.out.println("insert.");
 			}
 
 		}

@@ -1,5 +1,4 @@
 @attribute 'commentID' numeric
-@attribute 'project' numeric
 @attribute 'diffSize' numeric
 @attribute 'insertStatement' numeric
 @attribute 'insertStatementWeight' numeric
@@ -25,7 +24,6 @@
 @attribute 'firstDiffLocation' numeric
 @attribute 'tokenChange' numeric
 @attribute 'wordSize' numeric
-@attribute 'todos' numeric
 @attribute 'codeSimilarity' numeric
 @attribute 'oldCodeOldCommentSimilarity' numeric
 @attribute 'newCodeOldCommentSimilarity' numeric

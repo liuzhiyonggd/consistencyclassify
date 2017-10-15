@@ -1,35 +1,33 @@
 package sysu.consistency.db.bean;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
+import java.util.Set;
+
+import org.apache.commons.io.FileUtils;
 
 import sysu.consistency.db.mongo.RepositoryFactory;
 import sysu.consistency.db.repository.ClassMessageRepository;
 
 public class Test {
 	
-	public static void main(String[] args){
+	public static void main(String[] args) throws IOException{
 		testClassTable();
 	}
 	
-	public static void testClassTable(){
-		ClassMessageRepository classRepo = RepositoryFactory.getClassRepository();
-		
-		List<ClassMessage> classList = classRepo.findByProjectAndCommitID("jhotdraw", "100");
-		
-		ClassMessage clazz = classList.get(0);
-		
-		System.out.println(clazz.getProject());
-		System.out.println(clazz.getCommitID()+"");
-		System.out.println(clazz.getClassName());
-		System.out.println(clazz.getType());
-		System.out.println("new code:"+clazz.getNewCode().size());
-		System.out.println("old code:"+clazz.getOldCode().size());
-		System.out.println("new comment:"+clazz.getNewComment().size());
-		System.out.println("old comment:"+clazz.getOldComment().size());
-		System.out.println("new token:"+clazz.getNewTokenList().size());
-		System.out.println("old token:"+clazz.getOldTokenList().size());
-		System.out.println("diff:"+clazz.getDiffList().size());
-//		System.out.println(clazz.getIsCoreProbability());
+	public static void testClassTable() throws IOException{
+		List<String> idFile = FileUtils.readLines(new File("e:/注释作用域实验/purpose_id.txt"),"UTF-8");
+		Set<String> randomIdList = new HashSet<String>();
+		Random random = new Random();
+		while(randomIdList.size()<2000) {
+			int randomIndex = random.nextInt(idFile.size()-1);
+			randomIdList.add(idFile.get(randomIndex));
+		}
+		FileUtils.writeLines(new File("e:/注释作用域实验/purpose_id_random.txt"), randomIdList);
 	}
 
 }

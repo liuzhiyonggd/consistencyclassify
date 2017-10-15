@@ -6,6 +6,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import edu.mit.jwi.Dictionary;
 import edu.mit.jwi.IDictionary;
@@ -62,10 +64,18 @@ public class WordSpliter {
 			tempWordList.add(String.copyValueOf(charArray, startIndex, charArray.length-startIndex).toLowerCase());
 			for(String str2:tempWordList){
 				
-				//È¥ï¿½ï¿½Í£ï¿½Ã´ï¿½
-				if(Stopwords.isStopword(str2)){
+				//È¥³ýÍ£ÓÃ´Ê
+//				if(Stopwords.isStopword(str2)){
+//					continue;
+//				}
+				
+				//¹ýÂË·Ç·¨×Ö·û
+				Pattern pattern = Pattern.compile("[0-9a-zA-Z]+");
+				Matcher matcher = pattern.matcher(str2);
+				if(!matcher.matches()) {
 					continue;
 				}
+				
 				List<String> stemList = null;
 				try{
 					stemList = stemmer.findStems(str2, POS.NOUN);
