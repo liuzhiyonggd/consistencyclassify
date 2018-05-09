@@ -16,6 +16,7 @@ import weka.attributeSelection.Ranker;
 import weka.classifiers.CostMatrix;
 import weka.classifiers.Evaluation;
 import weka.classifiers.meta.CostSensitiveClassifier;
+import weka.classifiers.trees.J48;
 import weka.classifiers.trees.RandomForest;
 import weka.core.Debug.Random;
 import weka.core.Instance;
@@ -64,10 +65,12 @@ public class RandomForestClassifier {
 		}
 		
         classifier = new RandomForest();
+        classifier.setClassifier(new J48());
+//        classifier.setClassifier();
 //        classifier.buildClassifier(instancesTrain);
 		
 		costClassifier = new CostSensitiveClassifier();
-		CostMatrix matrix = new CostMatrix(new BufferedReader(new FileReader("D:/matrix.txt")));
+		CostMatrix matrix = new CostMatrix(new BufferedReader(new FileReader("file/matrix.txt")));
 		matrix.applyCostMatrix(instancesTrain, new Random());
 		
 		System.out.println(matrix.toString());
@@ -78,43 +81,9 @@ public class RandomForestClassifier {
 	
 	public void run(int iterate,int p,int k,String testFile,String savename){
 		init(iterate,p,k);
-		
-//		removeInstance(40);
-
-//		selectAttribute();
-//		discretize();
-//		standardize();
 		removeID();
-//		smoteSample();
 		train();
-//		evaluate();
-//		getPrecision("D:/work/5.10/test2.arff","without");
-		getPrecision("D:/work/5.15/test2/test2.arff","test2");
-		getPrecision("D:/work/5.15/test2/test3.arff","test3");
-		getPrecision("D:/work/5.15/test2/test4.arff","test4");
-		getPrecision("D:/work/5.15/test2/test5.arff","test5");
-		getPrecision("D:/work/5.15/test2/test6.arff","test6");
-		getPrecision("D:/work/5.15/test2/test7.arff","test7");
-		getPrecision("D:/work/5.15/test2/test8.arff","test8");
-//		getPrecision("D:/work/5.10/dataset/test2.arff",iterate+"_"+p+"_"+k);
-//		getPrecision("D:/work/5.10/dataset/test3.arff",iterate+"_"+p+"_"+k);
-//		getPrecision("D:/work/5.10/dataset/test4.arff",iterate+"_"+p+"_"+k);
-//		getPrecision("D:/work/5.10/dataset/test5.arff",iterate+"_"+p+"_"+k);
-//		getPrecision("D:/work/5.10/dataset/test6.arff",iterate+"_"+p+"_"+k);
-//		getPrecision("D:/work/5.10/dataset/test7.arff",iterate+"_"+p+"_"+k);
-//		getPrecision("D:/work/5.10/dataset/test8.arff",iterate+"_"+p+"_"+k);
-//		getPrecision("d:/work/5.10/dataset/test1.arff");
-//		getPrecision("d:/work/5.10/dataset/test2.arff");
-//		getPrecision("d:/work/5.10/dataset/test3.arff");
-//		getPrecision("d:/work/5.10/dataset/test4.arff");
-//		getPrecision("d:/work/5.10/dataset/test5.arff");
-//		getPrecision("d:/work/5.10/dataset/test6.arff");
-//		getPrecision("d:/work/5.10/dataset/test7.arff");
-//		getPrecision("d:/work/5.10/dataset/test8.arff");
-//		getPrecision("d:/work/5.8/opennms.arff");
-//		getPrecision("d:/work/5.8/jedit.arff");
-//		getPrecision("d:/work/5.8/kablink.arff");
-//		getPrecision("d:/work/5.8/ejbca.arff");
+		getPrecision(testFile,savename);
 	}
 
 	public void init(int iterate,int percentage,int featuresNum) {
@@ -272,10 +241,10 @@ public class RandomForestClassifier {
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
-			System.out.println("C45Classifier ����ʵ���������ɹ�.");
+			System.out.println("C45Classifier 锟斤拷锟斤拷实锟斤拷锟斤拷锟斤拷锟斤拷锟缴癸拷.");
 		} catch (Exception e) {
 			e.printStackTrace();
-			System.out.println("C45Classifier ����ʧ��.");
+			System.out.println("C45Classifier 锟斤拷锟斤拷失锟斤拷.");
 		}
 
 		return result;
@@ -318,9 +287,9 @@ public class RandomForestClassifier {
 				}else{
 					class_0++;
 				}
-				if((classifyValue>=0.5&&classValue==1.0d)||(classifyValue<0.5&&classValue==0.0d))// ���Ԥ��ֵ�ʹ�ֵ��ȣ����������еķ������ṩ����Ϊ��ȷ�𰸣�����������壩
+				if((classifyValue>=0.5&&classValue==1.0d)||(classifyValue<0.5&&classValue==0.0d))// 锟斤拷锟皆わ拷锟街碉拷痛锟街碉拷锟饺ｏ拷锟斤拷锟斤拷锟斤拷锟斤拷锟叫的凤拷锟斤拷锟斤拷锟结供锟斤拷锟斤拷为锟斤拷确锟金案ｏ拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷澹�
 	            {
-	              right++;//��ȷֵ��1
+	              right++;//锟斤拷确值锟斤拷1
 	              if(classValue==1.0d){
 	            	  right_1++;
 	              }else{
@@ -371,17 +340,17 @@ public class RandomForestClassifier {
 			System.out.println("class_0 F1:"+2*right_0*1.0d/class_0*right_0*1.0d/(right_0+false_0)/(right_0*1.0d/class_0+right_0*1.0d/(right_0+false_0)));
 			output.add("class_0 F1:"+2*right_0*1.0d/class_0*right_0*1.0d/(right_0+false_0)/(right_0*1.0d/class_0+right_0*1.0d/(right_0+false_0)));
 			System.out.println(false1CommentIDList.size());
-			FileUtils.writeLines(new File("D:/work/5.15/result2/false1_"+savename+".csv"), false1CommentIDList);
-			FileUtils.writeLines(new File("D:/work/5.15/result2/false0_"+savename+".csv"), false0CommentIDList);
-			FileUtils.writeLines(new File("D:/work/5.15/result2/"+savename+".txt"), output);
+			FileUtils.writeLines(new File("file/result/false1_"+savename+".csv"), false1CommentIDList);
+			FileUtils.writeLines(new File("file/result/false0_"+savename+".csv"), false0CommentIDList);
+			FileUtils.writeLines(new File("file/result/"+savename+".txt"), output);
 		} catch (IOException e) {
 			e.printStackTrace();
-			System.out.println("C45Classifier ����ʵ���������ɹ�.");
+			System.out.println("C45Classifier 锟斤拷锟斤拷实锟斤拷锟斤拷锟斤拷锟斤拷锟缴癸拷.");
 		} catch (Exception e) {
 			// 
 
 			e.printStackTrace();
-			System.out.println("C45Classifier ����ʧ��.");
+			System.out.println("C45Classifier 锟斤拷锟斤拷失锟斤拷.");
 		}
 		return result;
 	}
@@ -389,38 +358,11 @@ public class RandomForestClassifier {
 
 	public static void main(String[] args) throws Exception {
 		
-		List<String> output = new ArrayList<String>();
+		RandomForestClassifier rf = new RandomForestClassifier("file/train.arff","file/verify.arff");
+		rf.run(100, 100, 10, "file/verify.arff","result2" );
 		
-//		int[] ranker = new int[]{2,70,28,4,8,3,66,29,71,6,10,69,32,5,24,27,23,7,14,30,26,12,25,9,68,31,13,45,11,34,67,62,37,59,44,58,46,56,
-//				64,65,63,60,61,57,54,55,53,39,40,41,42,43,38,47,35,51,52,50,48,49,36};
-//		for(int i=1;i<ranker.length;i++){
-//		    List<Integer> removeList = new ArrayList<Integer>();
-//		    for(int j=0;j<i;j++){
-//		    	removeList.add(ranker[ranker.length-j-1]);
-//		    }
-			
-//				RandomForestClassifier rs = new RandomForestClassifier("d:/work/5.10/dataset/train1.arff","d:/work/5.10/dataset/test1.arff");
-//			    rs.run(500,100,10,"d:/work/5.10/dataset/test1.arff","test1");
-//			    
-//			    RandomForestClassifier rs2 = new RandomForestClassifier("d:/work/5.10/dataset/train3.arff","d:/work/5.10/dataset/test3.arff");
-//			    rs2.run(500,100,10,"d:/work/5.10/dataset/test3.arff","test3");
-//			    
-//			    RandomForestClassifier rs3 = new RandomForestClassifier("d:/work/5.10/dataset/train5.arff","d:/work/5.10/dataset/test5.arff");
-//			    rs3.run(500,100,10,"d:/work/5.10/dataset/test5.arff","test5");
-//			    
-//			    RandomForestClassifier rs4 = new RandomForestClassifier("d:/work/5.10/dataset/train6.arff","d:/work/5.10/dataset/test6.arff");
-//			    rs4.run(500,100,10,"d:/work/5.10/dataset/test6.arff","test6");
-//			    
-//			    RandomForestClassifier rs5 = new RandomForestClassifier("d:/work/5.10/dataset/train7.arff","d:/work/5.10/dataset/test7.arff");
-//			    rs5.run(500,100,10,"d:/work/5.10/dataset/test7.arff","test7");
-			    
-			    RandomForestClassifier rs6 = new RandomForestClassifier("d:/work/5.10/train2.arff","d:/work/5.10/test_2.arff");
-			    rs6.run(500,100,10,"d:/work/5.10/test_2.arff","test_2");
-					
-				
-//			output.addAll(rs.getOutput());
-//		}
-//		FileUtils.writeLines(new File("D:/work/4.12/output.txt"), output);
+		
+		
 //		RandomForestClassifier rs = new RandomForestClassifier("d:/temp/jhotdraw_lineTrain.arff","d:/temp/jhotdraw_lineTest.arff");
 //		System.out.println("jhotdraw:========================");
 //		rs.run();

@@ -5,7 +5,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-@Document(collection="class_message2")
+@Document(collection="class_message")
 public class ClassMessage {
 	@Id
 	private String id;

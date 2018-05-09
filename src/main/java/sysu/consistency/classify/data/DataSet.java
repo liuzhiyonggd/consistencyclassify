@@ -32,7 +32,7 @@ public class DataSet {
 		int count = 0;
 		for(String id:idList){
 			
-			int i=Integer.parseInt(id);
+			int i=Integer.parseInt(id.split(",")[0]);
 			count++;
 			if(count%1000==0){
 				System.out.println(i +" is done.");
@@ -42,31 +42,34 @@ public class DataSet {
 				System.out.println(i +" is null.");
 				continue;
 			}
-			
-			if(comment.getOldCode().size()>30) {
-				continue;
-			}
-			int newWordCount = 0;
-			int oldWordCount = 0;
-			for(String str:comment.getNewComment()) {
-				newWordCount += str.split(" ").length;
-			}
-			for(String str:comment.getOldComment()) {
-				oldWordCount += str.split(" ").length;
-			}
-			if(newWordCount>20||newWordCount<3) {
-				continue;
-			}
-			if(oldWordCount>20||oldWordCount<3) {
+			if(comment.getDiffList().size()<=0) {
 				continue;
 			}
 			
+//			if(comment.getOldCode().size()>30) {
+//				continue;
+//			}
+//			int newWordCount = 0;
+//			int oldWordCount = 0;
+//			for(String str:comment.getNewComment()) {
+//				newWordCount += str.split(" ").length;
+//			}
+//			for(String str:comment.getOldComment()) {
+//				oldWordCount += str.split(" ").length;
+//			}
+//			if(newWordCount>20||newWordCount<3) {
+//				continue;
+//			}
+//			if(oldWordCount>20||oldWordCount<3) {
+//				continue;
+//			}
+//			
 			List<Integer> vector = extractLineVector(comment);
 			
 			data.add(vector);
 		}
 		
-		writeFile(data, savePath+"/data3"+".txt");
+		writeFile(data, savePath+"/data9"+".txt");
 		System.out.println("write data file is done.");
 		}
 		
@@ -631,7 +634,7 @@ public class DataSet {
 	}
 	
 	public static void main(String[] args) throws IOException{
-		DataSet.generateDataSet("E:\\注释一致性实验\\数据\\selectID.txt","dataset");
+		DataSet.generateDataSet("file/data_1_2_5_6_3.csv","dataset");
 //		List<List<Integer>> vectorList1 = getVectorList4File("dataset/data.txt");
 //		List<List<Integer>> vectorList2 = getVectorList4File("dataset/refactorHibernate.txt");
 //		List<List<Integer>> vectorList = combineVectors(vectorList1, vectorList2);

@@ -16,6 +16,29 @@ import edu.mit.jwi.morph.WordnetStemmer;
 
 public class WordSpliter {
 	
+	private static WordnetStemmer stemmer = null;
+	
+	static {
+		//WordNet ����ȡ�ʸ�
+				String wnhome = "C:/Program Files (x86)/WordNet/2.1"; //��ȡ��������WNHOME
+			    String path = wnhome + File.separator+ "dict";
+			    URL url = null;
+				try {
+					url = new URL("file", null, path);
+				} catch (MalformedURLException e) {
+					System.out.println("wordnet url is error.");
+				}  //����һ��URL����ָ��WordNet��ditcĿ¼
+				if(url!=null){
+					IDictionary dict=new Dictionary(url);
+					try {
+						dict.open();
+					} catch (IOException e) {
+						System.out.println("dictionary create is error.");
+					} //�򿪴ʵ�
+					stemmer = new WordnetStemmer(dict);
+				}
+	}
+	
 	public static List<String> split(String sentense){
 		
 		//��comment1 �� comment2 ���зִ�
@@ -25,27 +48,6 @@ public class WordSpliter {
 		String splitToken = " .,;:/&|`~%+=-*<>$#@!^\\()[]{}''\"\r\n\t";
 		StringTokenizer st = new StringTokenizer(sentense,splitToken,false);
 		List<String> wordList = new ArrayList<String>();
-		
-		//WordNet ����ȡ�ʸ�
-		String wnhome = "C:/Program Files (x86)/WordNet/2.1"; //��ȡ��������WNHOME
-	    String path = wnhome + File.separator+ "dict";
-	    URL url = null;
-	    WordnetStemmer stemmer = null;
-		try {
-			url = new URL("file", null, path);
-		} catch (MalformedURLException e) {
-			System.out.println("wordnet url is error.");
-		}  //����һ��URL����ָ��WordNet��ditcĿ¼
-		if(url!=null){
-			IDictionary dict=new Dictionary(url);
-			try {
-				dict.open();
-			} catch (IOException e) {
-				System.out.println("dictionary create is error.");
-			} //�򿪴ʵ�
-			stemmer = new WordnetStemmer(dict);
-		}
-		
 		
 		//�Էִʺõ��ַ������дʸ���ȡ
 		while(st.hasMoreTokens()){

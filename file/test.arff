@@ -1,0 +1,10 @@
+@Relation 'test'
+@attribute 'test1' numeric
+@attribute 'test2' numeric
+@attribute 'class' {0,1}
+@data
+1,0,0
+1,0,0
+0,1,0
+0,0,0
+1,1,1

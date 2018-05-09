@@ -13,7 +13,6 @@ import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
 import com.mongodb.ServerAddress;
 
-import sysu.consistency.tools.Test;
 
 @Configuration
 @ComponentScan
@@ -29,13 +28,9 @@ public class MongoConfig extends AbstractMongoConfiguration{
 	@Override
 	public Mongo mongo() throws Exception {
 //		MongoCredential credential = MongoCredential.createMongoCRCredential("zhiyong", "sourcebase", "liu888888".toCharArray());
-		return new MongoClient(new ServerAddress("192.168.2.168",27017));
+		return new MongoClient(new ServerAddress("192.168.1.61",27017));
 //		return new MongoClient("localhost");
 	}
 	
-	@Bean
-	public Test test(){
-		return new Test();
-	}
 	
 }
